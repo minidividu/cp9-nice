@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CP9 - Chasse au Trésor Nice</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f4f4; }
+        .badge-box { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+        .badge { width: 40px; height: 40px; border-radius: 50%; background: #ccc; display: flex; align-items: center; justify-content: center; font-size: 0.8em; color: white; }
+        .active { background: #007bff; box-shadow: 0 0 10px rgba(0,123,255,0.5); }
+        #win-section { display: none; background: #d4edda; padding: 20px; border-radius: 10px; border: 2px dashed #28a745; margin-top: 20px; }
+        input { padding: 10px; margin: 5px; width: 80%; max-width: 300px; border-radius: 5px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 PROJET CP9</h1>
+    <p>Trouve les 10 affiches dans Nice pour gagner ton accès VIP !</p>
+
+    <div class="badge-box" id="badges-container"></div>
+    <p id="status-text">Scanne ta première affiche...</p>
+
+    <div id="win-section">
+        <h2>🏆 TU AS RÉUSSI !</h2>
+        <p>Laisse tes infos pour recevoir ta récompense :</p>
+        <form action="https://formspree.io/f/TON_ID_ICI" method="POST">
+            <input type="text" name="name" placeholder="Ton nom / Pseudo Insta" required>
+            <input type="email" name="email" placeholder="Ton Email" required>
+            <input type="hidden" name="message" value="A trouvé les 10 badges CP9">
+            <button type="submit">Réclamer mon cadeau</button>
+        </form>
+    </div>
+
+    <script>
+        const nBadgesTotal = 10;
+        const container = document.getElementById('badges-container');
+        
+        // 1. Créer les ronds de badges visuellement
+        for (let i = 1; i <= nBadgesTotal; i++) {
+            let div = document.createElement('div');
+            div.id = 'b' + i;
+            div.className = 'badge';
+            div.innerText = i;
+            container.appendChild(div);
+        }
+
+        // 2. Logique de capture
+        const urlParams = new URLSearchParams(window.location.search);
+        const badgeId = urlParams.get('badge');
+        let badgesFound = JSON.parse(localStorage.getItem('cp9_badges')) || [];
+
+        if (badgeId && !badgesFound.includes(badgeId)) {
+            badgesFound.push(badgeId);
+            localStorage.setItem('cp9_badges', JSON.stringify(badgesFound));
+        }
+
+        // 3. Mise à jour de l'affichage
+        badgesFound.forEach(id => {
+            const el = document.getElementById('b' + id);
+            if (el) el.classList.add('active');
+        });
+
+        document.getElementById('status-text').innerText = `Badges trouvés : ${badgesFound.length} / ${nBadgesTotal}`;
+
+        // 4. Afficher le formulaire si 10 badges
+        if (badgesFound.length >= nBadgesTotal) {
+            document.getElementById('win-section').style.display = 'block';
+            document.getElementById('status-text').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
