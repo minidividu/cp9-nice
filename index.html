@@ -3,115 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CP9 SQUADRA - ÉVÉNEMENT SAINT RIQUIER</title>
+    <title>CP9 SQUADRA - ÉVÉNEMENT NICE</title>
     <style>
         :root {
             --gold: #d4af37;
             --rare-red: #b30000;
             --common-green: #2e7d32;
         }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; }
-        .header { background: linear-gradient(to bottom, #111, #000); padding: 30px 20px; border-bottom: 2px solid var(--gold); }
+        body { 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            background: #000; 
+            color: #fff; 
+            margin: 0; 
+            padding: 0; 
+            text-align: center;
+        }
+        .header { 
+            background: linear-gradient(to bottom, #111, #000); 
+            padding: 30px 20px; 
+            border-bottom: 2px solid var(--gold); 
+        }
         h1 { margin: 0; letter-spacing: 3px; color: var(--gold); font-size: 1.8em; }
         
-        .card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; padding: 20px; }
+        /* Grille des cartes */
+        .card-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 15px; 
+            padding: 20px; 
+        }
+        .card-item { 
+            background: #111; 
+            border: 1px solid #333; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            position: relative; 
+            transition: 0.3s;
+        }
+        .card-item.active { 
+            border-color: var(--gold); 
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); 
+        }
+        .card-item img { 
+            width: 100%; 
+            filter: grayscale(100%); 
+            opacity: 0.3; 
+            transition: 0.5s;
+        }
+        .card-item.active img { 
+            filter: grayscale(0%); 
+            opacity: 1; 
+        }
         
-        .card-item { background: #111; border: 1px solid #333; border-radius: 10px; overflow: hidden; transition: transform 0.3s; position: relative; }
-        .card-item.active { border-color: var(--gold); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
-        .card-item img { width: 100%; filter: grayscale(100%); opacity: 0.5; }
-        .card-item.active img { filter: grayscale(0%); opacity: 1; }
-        
-        .rarity-tag { position: absolute; top: 5px; right: 5px; font-size: 0.7em; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; font-weight: bold; }
+        .rarity-tag { 
+            position: absolute; top: 5px; right: 5px; 
+            font-size: 0.6em; padding: 2px 6px; 
+            border-radius: 3px; text-transform: uppercase; font-weight: bold; 
+        }
         .rare { background: var(--rare-red); }
         .legend { background: var(--gold); color: #000; }
         .common { background: var(--common-green); }
 
-        .rules-section { background: #0a0a0a; margin: 20px; padding: 20px; border-radius: 15px; border-left: 4px solid var(--gold); text-align: left; }
-        .rules-section h2 { color: var(--gold); font-size: 1.2em; margin-top: 0; }
-        .rules-list { list-style: none; padding: 0; font-size: 0.9em; line-height: 1.6; }
-        .rules-list li { margin-bottom: 10px; display: flex; align-items: flex-start; }
-        .rules-list li::before { content: "⚡"; margin-right: 10px; color: var(--gold); }
+        /* Overlay Carte Rare */
+        #exclu-overlay {
+            position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.95); 
+            z-index: 10000; 
+            display: none; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+        }
 
-        .scan-button { background: var(--gold); color: #000; padding: 15px 30px; border: none; border-radius: 50px; font-weight: bold; font-size: 1.1em; margin: 20px auto; display: block; cursor: pointer; text-decoration: none; width: fit-content; }
-        
-        #victory-msg { display: none; background: linear-gradient(45deg, #000, #222); border: 2px solid var(--gold); margin: 20px; padding: 20px; border-radius: 15px; animation: glow 2s infinite alternate; }
-        @keyframes glow { from { box-shadow: 0 0 5px var(--gold); } to { box-shadow: 0 0 20px var(--gold); } }
+        .scan-button { 
+            background: var(--gold); 
+            color: #000; 
+            padding: 15px 30px; 
+            border-radius: 50px; 
+            font-weight: bold; 
+            text-decoration: none; 
+            display: inline-block;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1>CP9 SQUADRA</h1>
-        <p style="color: #888;">Live @ Saint Riquier</p>
+        <p style="color: #888;">ÉVÉNEMENT EXCLUSIF NICE</p>
     </div>
 
-    <div class="rules-section">
-        <h2>📜 RÈGLES DU JEU</h2>
-        <ul class="rules-list">
-            <li><strong>Cartes Communes (Vert) :</strong> Collectionne les 4 lettres P-U-Z-Z pour débloquer 4 shots au bar.</li>
-            <li><strong>Cartes Rares (Or/Rouge) :</strong> Scanne l'Exclu pour écouter 30s d'un morceau inédit directement sur ton téléphone.</li>
-            <li><strong>Cartes Légendaires :</strong> Trouve le "Contrat Pro" ou le "5ème Membre" pour des avantages réels (Story Insta ou montée sur scène).</li>
-        </ul>
-    </div>
-
-    <div id="status-bar" style="margin-bottom: 10px; font-weight: bold;">
-        Progression Collection : <span id="count">0</span> / 6
+    <div id="status-bar" style="margin: 20px; font-weight: bold; color: var(--gold);">
+        Progression : <span id="count">0</span> / 4
     </div>
 
     <div class="card-container">
         <div class="card-item" id="card-puzzle">
             <span class="rarity-tag common">Commune</span>
-            <img src="9789.jpg" alt="Puzzle Crew">
-            <p style="font-size: 0.8em; padding: 5px;">Puzzle Crew (1/4)</p>
+            <img src="puzzle.jpg" alt="Puzzle">
+            <p style="font-size: 0.7em; padding: 5px;">Puzzle Crew</p>
         </div>
         <div class="card-item" id="card-exclu">
             <span class="rarity-tag rare">Rare</span>
-            <img src="9799.png" alt="L'Exclu">
-            <p style="font-size: 0.8em; padding: 5px;">L'Exclu Inédite</p>
+            <img src="exclu.png" alt="Exclu">
+            <p style="font-size: 0.7em; padding: 5px;">L'Exclu Inédite</p>
         </div>
         <div class="card-item" id="card-contrat">
             <span class="rarity-tag legend">Légendaire</span>
-            <img src="9791.jpg" alt="Contrat Pro">
-            <p style="font-size: 0.8em; padding: 5px;">Contrat Pro</p>
+            <img src="contrat.jpg" alt="Contrat">
+            <p style="font-size: 0.7em; padding: 5px;">Contrat Pro</p>
         </div>
         <div class="card-item" id="card-membre">
             <span class="rarity-tag legend">Légendaire</span>
-            <img src="9793.jpg" alt="5ème Membre">
-            <p style="font-size: 0.8em; padding: 5px;">5ème Membre</p>
+            <img src="membre.jpg" alt="Membre">
+            <p style="font-size: 0.7em; padding: 5px;">5ème Membre</p>
         </div>
-        </div>
-
-    <div id="victory-msg">
-        <h2 style="color: var(--gold);">🏆 COLLECTION COMPLÈTE !</h2>
-        <p>Présente cet écran au staff CP9 pour récupérer ton pack VIP.</p>
     </div>
 
-    <a href="#" class="scan-button" onclick="alert('Ouvre l\'appareil photo de ton téléphone pour scanner une carte !')">SCANNER UNE CARTE</a>
+    <a href="#" class="scan-button" onclick="alert('Utilise l\'appareil photo de ton téléphone pour scanner un QR Code CP9 !')">SCANNER UNE CARTE</a>
+
+    <div id="exclu-overlay">
+        <div style="position:relative; width:85%; max-width:380px;">
+            <img src="exclu.png" style="width:100%; border:3px solid var(--gold); border-radius:20px; box-shadow: 0 0 30px var(--gold);">
+            <button onclick="document.getElementById('exclu-overlay').style.display='none'" style="position:absolute; top:-45px; right:0; color:var(--gold); background:none; border:2px solid var(--gold); border-radius:50%; width:35px; height:35px; cursor:pointer;">X</button>
+        </div>
+        <p style="color:var(--gold); margin-top:20px; font-weight:bold; letter-spacing:2px;">CARTE RARE DÉBLOQUÉE</p>
+        <p style="font-size: 0.9em;">Branche le casque : 30s d'écoute activées</p>
+        <audio id="audio-exclu" src="exclu.mp3"></audio>
+    </div>
 
     <script>
-        // Système de déblocage par URL : ?get=puzzle ou ?get=exclu ou ?get=contrat ou ?get=membre
         const params = new URLSearchParams(window.location.search);
         const getCard = params.get('get');
-
         let collection = JSON.parse(localStorage.getItem('cp9_collection')) || [];
 
-        if (getCard && !collection.includes(getCard)) {
-            collection.push(getCard);
-            localStorage.setItem('cp9_collection', JSON.stringify(collection));
-            alert("Nouvelle carte débloquée : " + getCard.toUpperCase() + " !");
+        // 1. Gestion du déblocage
+        if (getCard) {
+            if (!collection.includes(getCard)) {
+                collection.push(getCard);
+                localStorage.setItem('cp9_collection', JSON.stringify(collection));
+            }
+            
+            // Si c'est l'exclu, on affiche le pop-up et on lance le son
+            if (getCard === 'exclu') {
+                document.getElementById('exclu-overlay').style.display = 'flex';
+                const audio = document.getElementById('audio-exclu');
+                audio.play().catch(e => console.log("Lecture auto bloquée par le navigateur"));
+            }
         }
 
-        // Mise à jour visuelle
+        // 2. Mise à jour visuelle de la collection
         collection.forEach(id => {
             const cardElement = document.getElementById('card-' + id);
             if (cardElement) cardElement.classList.add('active');
         });
 
         document.getElementById('count').innerText = collection.length;
-
-        if (collection.length >= 4) { // Ajuste selon le nombre total de tes cartes
-            document.getElementById('victory-msg').style.display = 'block';
-        }
     </script>
 </body>
 </html>
