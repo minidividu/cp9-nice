@@ -3,88 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CP9 SQUADRA - ÉVÉNEMENT NICE</title>
+    <title>CP9 SQUADRA - NIGHTLIFE PUZZLE</title>
     <style>
         :root {
             --gold: #d4af37;
             --rare-red: #b30000;
+            --puzzle-blue: #0077b6;
             --common-green: #2e7d32;
+            --bg-dark: #0a0a0a;
         }
         body { 
             font-family: 'Segoe UI', Roboto, sans-serif; 
-            background: #000; 
+            background: var(--bg-dark); 
             color: #fff; 
-            margin: 0; 
-            padding: 0; 
-            text-align: center;
+            margin: 0; padding: 0; text-align: center;
         }
         .header { 
-            background: linear-gradient(to bottom, #111, #000); 
-            padding: 30px 20px; 
+            background: linear-gradient(to bottom, #1a1a1a, #000); 
+            padding: 40px 20px; 
             border-bottom: 2px solid var(--gold); 
         }
-        h1 { margin: 0; letter-spacing: 3px; color: var(--gold); font-size: 1.8em; }
+        h1 { margin: 0; letter-spacing: 5px; color: var(--gold); font-size: 2.2em; text-transform: uppercase; }
         
+        .status-panel {
+            background: #111;
+            margin: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #333;
+        }
+
         /* Grille des cartes */
         .card-container { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
-            gap: 15px; 
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); 
+            gap: 12px; 
             padding: 20px; 
         }
         .card-item { 
-            background: #111; 
-            border: 1px solid #333; 
-            border-radius: 10px; 
+            background: #151515; 
+            border: 2px solid #222; 
+            border-radius: 12px; 
             overflow: hidden; 
             position: relative; 
-            transition: 0.3s;
+            transition: all 0.4s ease;
+            filter: grayscale(100%) brightness(50%);
         }
         .card-item.active { 
             border-color: var(--gold); 
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); 
+            filter: grayscale(0%) brightness(100%);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            transform: translateY(-5px);
         }
-        .card-item img { 
-            width: 100%; 
-            filter: grayscale(100%); 
-            opacity: 0.3; 
-            transition: 0.5s;
-        }
-        .card-item.active img { 
-            filter: grayscale(0%); 
-            opacity: 1; 
-        }
+        .card-item img { width: 100%; display: block; }
+        .card-label { font-size: 0.65em; padding: 8px 2px; font-weight: bold; background: #000; }
         
         .rarity-tag { 
-            position: absolute; top: 5px; right: 5px; 
-            font-size: 0.6em; padding: 2px 6px; 
-            border-radius: 3px; text-transform: uppercase; font-weight: bold; 
+            position: absolute; top: 5px; left: 5px; 
+            font-size: 0.5em; padding: 2px 5px; 
+            border-radius: 3px; text-transform: uppercase; z-index: 10;
         }
-        .rare { background: var(--rare-red); }
         .legend { background: var(--gold); color: #000; }
-        .common { background: var(--common-green); }
+        .rare { background: var(--rare-red); }
+        .puzzle { background: var(--puzzle-blue); }
 
-        /* Overlay Carte Rare */
-        #exclu-overlay {
+        /* Overlay Récompense */
+        #reward-overlay {
             position: fixed; top: 0; left: 0; 
             width: 100%; height: 100%; 
             background: rgba(0,0,0,0.95); 
-            z-index: 10000; 
-            display: none; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center;
+            z-index: 10000; display: none; 
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .reward-box {
+            width: 85%; max-width: 400px;
+            border: 3px solid var(--gold);
+            border-radius: 20px; padding: 20px;
+            background: #111; text-align: center;
         }
 
-        .scan-button { 
-            background: var(--gold); 
-            color: #000; 
-            padding: 15px 30px; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            text-decoration: none; 
-            display: inline-block;
-            margin: 20px 0;
+        .scan-btn { 
+            background: var(--gold); color: #000; 
+            padding: 18px 40px; border-radius: 50px; 
+            font-weight: bold; text-decoration: none; 
+            display: inline-block; margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
         }
     </style>
 </head>
@@ -92,75 +95,109 @@
 
     <div class="header">
         <h1>CP9 SQUADRA</h1>
-        <p style="color: #888;">ÉVÉNEMENT EXCLUSIF NICE</p>
+        <p style="color: #888; font-size: 0.9em;">NICE NIGHTLIFE • 20€ / CARTE</p>
     </div>
 
-    <div id="status-bar" style="margin: 20px; font-weight: bold; color: var(--gold);">
-        Progression : <span id="count">0</span> / 4
+    <div class="status-panel">
+        <div style="color: var(--gold); font-weight: bold; margin-bottom: 10px;">VOTRE COLLECTION</div>
+        <div style="font-size: 1.5em;"><span id="count">0</span> / 200</div>
     </div>
 
-    <div class="card-container">
-        <div class="card-item" id="card-puzzle">
-            <span class="rarity-tag common">Commune</span>
-            <img src="puzzle.jpg" alt="Puzzle">
-            <p style="font-size: 0.7em; padding: 5px;">Puzzle Crew</p>
+    <h3 style="color: var(--puzzle-blue);">🧩 PUZZLES EN COURS</h3>
+    <div class="card-container" id="grid-puzzles">
         </div>
-        <div class="card-item" id="card-exclu">
-            <span class="rarity-tag rare">Rare</span>
-            <img src="exclu.png" alt="Exclu">
-            <p style="font-size: 0.7em; padding: 5px;">L'Exclu Inédite</p>
-        </div>
-        <div class="card-item" id="card-contrat">
-            <span class="rarity-tag legend">Légendaire</span>
-            <img src="contrat.jpg" alt="Contrat">
-            <p style="font-size: 0.7em; padding: 5px;">Contrat Pro</p>
-        </div>
-        <div class="card-item" id="card-membre">
-            <span class="rarity-tag legend">Légendaire</span>
-            <img src="membre.jpg" alt="Membre">
-            <p style="font-size: 0.7em; padding: 5px;">5ème Membre</p>
-        </div>
-    </div>
 
-    <a href="#" class="scan-button" onclick="alert('Utilise l\'appareil photo de ton téléphone pour scanner un QR Code CP9 !')">SCANNER UNE CARTE</a>
-
-    <div id="exclu-overlay">
-        <div style="position:relative; width:85%; max-width:380px;">
-            <img src="exclu.png" style="width:100%; border:3px solid var(--gold); border-radius:20px; box-shadow: 0 0 30px var(--gold);">
-            <button onclick="document.getElementById('exclu-overlay').style.display='none'" style="position:absolute; top:-45px; right:0; color:var(--gold); background:none; border:2px solid var(--gold); border-radius:50%; width:35px; height:35px; cursor:pointer;">X</button>
+    <h3 style="color: var(--rare-red);">💎 RÉCOMPENSES UNIQUES</h3>
+    <div class="card-container" id="grid-exclu">
         </div>
-        <p style="color:var(--gold); margin-top:20px; font-weight:bold; letter-spacing:2px;">CARTE RARE DÉBLOQUÉE</p>
-        <p style="font-size: 0.9em;">Branche le casque : 30s d'écoute activées</p>
-        <audio id="audio-exclu" src="exclu.mp3"></audio>
+
+    <a href="#" class="scan-btn" onclick="alert('Ouvre ton appareil photo et scanne le QR Code sur ta carte physique !')">SCANNER UNE CARTE</a>
+
+    <div id="reward-overlay">
+        <div class="reward-box">
+            <h2 id="reward-title" style="color: var(--gold);">SUCCÈS !</h2>
+            <p id="reward-desc"></p>
+            <button onclick="closeOverlay()" style="background: var(--gold); border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;">FERMER</button>
+        </div>
     </div>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const getCard = params.get('get');
-        let collection = JSON.parse(localStorage.getItem('cp9_collection')) || [];
+        // Configuration des cartes importantes
+        const CARD_DATA = [
+            { id: 'shots_s', name: 'S - SHOTS', type: 'puzzle' },
+            { id: 'shots_h', name: 'H - SHOTS', type: 'puzzle' },
+            { id: 'shots_o', name: 'O - SHOTS', type: 'puzzle' },
+            { id: 'shots_t', name: 'T - SHOTS', type: 'puzzle' },
+            { id: 'shots_s2', name: 'S2 - SHOTS', type: 'puzzle' },
+            { id: 'dj_1', name: 'MUSIQUE 1/3', type: 'puzzle' },
+            { id: 'dj_2', name: 'MUSIQUE 2/3', type: 'puzzle' },
+            { id: 'dj_3', name: 'MUSIQUE 3/3', type: 'puzzle' },
+            { id: 'bouteille_a', name: 'BOUT. GAUCHE', type: 'rare' },
+            { id: 'bouteille_b', name: 'BOUT. DROITE', type: 'rare' },
+            { id: 'pompier', name: 'POMPIER/INF.', type: 'rare' },
+            { id: 'insta', name: 'INSTA STAFF', type: 'rare' },
+            { id: 'cocktail', name: 'MIXOLOGUE', type: 'legend' },
+            { id: 'escorte', name: 'ESCORTES VIP', type: 'legend' }
+        ];
 
-        // 1. Gestion du déblocage
-        if (getCard) {
-            if (!collection.includes(getCard)) {
-                collection.push(getCard);
-                localStorage.setItem('cp9_collection', JSON.stringify(collection));
-            }
-            
-            // Si c'est l'exclu, on affiche le pop-up et on lance le son
-            if (getCard === 'exclu') {
-                document.getElementById('exclu-overlay').style.display = 'flex';
-                const audio = document.getElementById('audio-exclu');
-                audio.play().catch(e => console.log("Lecture auto bloquée par le navigateur"));
+        let collection = JSON.parse(localStorage.getItem('cp9_cards')) || [];
+
+        function initGrid() {
+            const gridPuzzles = document.getElementById('grid-puzzles');
+            const gridExclu = document.getElementById('grid-exclu');
+
+            CARD_DATA.forEach(card => {
+                const div = document.createElement('div');
+                div.className = `card-item ${collection.includes(card.id) ? 'active' : ''}`;
+                div.id = 'card-' + card.id;
+                div.innerHTML = `
+                    <span class="rarity-tag ${card.type}">${card.type}</span>
+                    <img src="https://via.placeholder.com/150/111/d4af37?text=${card.id.toUpperCase()}" alt="${card.name}">
+                    <div class="card-label">${card.name}</div>
+                `;
+                
+                if(card.type === 'puzzle') gridPuzzles.appendChild(div);
+                else gridExclu.appendChild(div);
+            });
+            document.getElementById('count').innerText = collection.length;
+        }
+
+        function checkParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const get = urlParams.get('get');
+
+            if (get) {
+                if (!collection.includes(get)) {
+                    collection.push(get);
+                    localStorage.setItem('cp9_cards', JSON.stringify(collection));
+                    showReward(get);
+                }
             }
         }
 
-        // 2. Mise à jour visuelle de la collection
-        collection.forEach(id => {
-            const cardElement = document.getElementById('card-' + id);
-            if (cardElement) cardElement.classList.add('active');
-        });
+        function showReward(id) {
+            const overlay = document.getElementById('reward-overlay');
+            const title = document.getElementById('reward-title');
+            const desc = document.getElementById('reward-desc');
 
-        document.getElementById('count').innerText = collection.length;
+            overlay.style.display = 'flex';
+            title.innerText = "CARTE DÉBLOQUÉE !";
+            desc.innerText = `Tu as obtenu la carte : ${id.toUpperCase()}. Trouve les autres lettres ou va au bar pour ta récompense !`;
+            
+            // Logique spécifique (ex: bouteille)
+            if(id.includes('bouteille')) desc.innerText = "PIÈCE DE BOUTEILLE ! Trouve l'autre moitié ou échange-la contre 2 verres au bar.";
+        }
+
+        function closeOverlay() {
+            document.getElementById('reward-overlay').style.display = 'none';
+            window.history.replaceState({}, document.title, window.location.pathname);
+            location.reload();
+        }
+
+        window.onload = () => {
+            initGrid();
+            checkParams();
+        };
     </script>
 </body>
 </html>
