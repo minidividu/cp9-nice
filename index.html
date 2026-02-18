@@ -3,14 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CP9 SQUADRA - NIGHTLIFE PUZZLE</title>
+  <title>CP9 SQUADRA - COLLECTION</title>
   <style>
     :root{
       --gold:#d4af37;
       --rare-red:#b30000;
       --puzzle-blue:#0077b6;
-      --common-green:#2e7d32;
-      --love-pink:#ff4fa3;
       --bg-dark:#0a0a0a;
     }
     body{
@@ -38,9 +36,7 @@
       padding:10px 14px;border-radius:999px;font-weight:800;cursor:pointer;
     }
     .pill.gold{background:var(--gold);color:#000;border:none;}
-    .pill.love{background:var(--love-pink);color:#000;border:none;}
 
-    /* Grilles */
     .card-container{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
@@ -63,12 +59,10 @@
     .rarity-tag{
       position:absolute;top:6px;left:6px;
       font-size:.55em;padding:3px 6px;border-radius:4px;text-transform:uppercase;z-index:10;
-      letter-spacing:.5px;
     }
     .legend{background:var(--gold);color:#000;}
     .rare{background:var(--rare-red);}
     .puzzle{background:var(--puzzle-blue);}
-    .love{background:var(--love-pink);color:#000;}
 
     .scan-btn{
       background:var(--gold);color:#000;
@@ -77,12 +71,10 @@
       box-shadow:0 4px 15px rgba(212,175,55,.4);
     }
 
-    /* Overlay */
     #reward-overlay{
       position:fixed;top:0;left:0;width:100%;height:100%;
       background:rgba(0,0,0,.95);z-index:10000;display:none;
-      flex-direction:column;justify-content:center;align-items:center;
-      padding:20px;
+      flex-direction:column;justify-content:center;align-items:center;padding:20px;
     }
     .reward-box{
       width:92%;max-width:420px;
@@ -93,32 +85,22 @@
       font-weight:900;cursor:pointer;margin-top:12px;
     }
     .btn.dark{background:#222;color:#fff;border:1px solid #333;}
-    .btn.pink{background:var(--love-pink);color:#000;}
 
-    /* Modal Inscription */
     #register-modal{
       position:fixed;inset:0;z-index:11000;display:none;
-      background:rgba(0,0,0,.92);
-      align-items:center;justify-content:center;
-      padding:20px;
+      background:rgba(0,0,0,.92);align-items:center;justify-content:center;padding:20px;
     }
     .modal-box{
       width:92%;max-width:460px;background:#0f0f0f;border:1px solid #333;border-radius:18px;
       padding:18px;text-align:left;
     }
-    .modal-title{font-size:1.05em;font-weight:900;color:var(--gold);margin:0 0 8px;}
     .field{display:flex;flex-direction:column;gap:6px;margin:10px 0;}
-    .field label{font-size:.85em;color:#bbb;font-weight:800;}
-    .field input,.field select{
+    .field input{
       background:#070707;border:1px solid #2a2a2a;color:#fff;border-radius:12px;
-      padding:12px 12px;font-weight:800;outline:none;
+      padding:12px;font-weight:800;outline:none;
     }
-    .modal-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px;}
 
-    /* Confetti canvas */
-    #confetti{
-      position:fixed;inset:0;pointer-events:none;z-index:12000;
-    }
+    #confetti{position:fixed;inset:0;pointer-events:none;z-index:12000;}
   </style>
 </head>
 
@@ -127,244 +109,90 @@
 
   <div class="header">
     <h1>CP9 SQUADRA</h1>
-    <p style="color:#888;font-size:.9em;margin:10px 0 0;">NICE NIGHTLIFE • 20€ / CARTE</p>
+    <p style="color:#888;font-size:.9em;margin:10px 0 0;">NICE NIGHTLIFE • COLLECTION</p>
   </div>
 
   <div class="status-panel">
     <div class="status-left">
       <div style="color:var(--gold);font-weight:900;">VOTRE COLLECTION</div>
-      <div style="font-size:1.5em;font-weight:900;"><span id="count">0</span> / 200</div>
-      <div id="profile-badge" style="color:#aaa;font-size:.85em;"></div>
+      <div style="font-size:1.5em;font-weight:900;"><span id="count">0</span> / 12</div>
+      <div id="profile-badge" style="color:#aaa;font-size:.85em;">Profil: non inscrit</div>
     </div>
     <div class="status-right">
-      <button class="pill love" onclick="openLoveCode()">💘 LOVE MATCH</button>
-      <button class="pill gold" onclick="openBarPass()">🎟️ BAR PASS</button>
-      <button class="pill" onclick="enterBarMode()">🍸 MODE BAR</button>
-      <button class="pill" onclick="openRegister('manual')">📝 S’INSCRIRE</button>
+      <button class="pill" onclick="openRegister()">📝 S’INSCRIRE</button>
       <button class="pill" onclick="resetAll()">RESET</button>
     </div>
   </div>
 
-  <h3 style="color:var(--puzzle-blue);margin:10px 0 0;">🧩 PUZZLES EN COURS</h3>
+  <h3 style="color:var(--puzzle-blue);margin:10px 0 0;">🧩 PUZZLES</h3>
   <div class="card-container" id="grid-puzzles"></div>
 
-  <h3 style="color:var(--rare-red);margin:10px 0 0;">💎 RÉCOMPENSES UNIQUES</h3>
+  <h3 style="color:var(--rare-red);margin:10px 0 0;">💎 CARTES RARES</h3>
   <div class="card-container" id="grid-exclu"></div>
 
-  <a href="#" class="scan-btn" onclick="alert('Ouvre ton appareil photo et scanne le QR Code sur ta carte physique !')">
-    SCANNER UNE CARTE
-  </a>
+  <div style="margin-top: 30px;">
+    <p style="color: #666; font-size: 0.8em;">Scannez le QR Code derrière vos cartes pour les ajouter.</p>
+  </div>
 
-  <!-- Overlay récompense -->
   <div id="reward-overlay">
     <div class="reward-box">
-      <h2 id="reward-title" style="color:var(--gold);margin:0 0 8px;">SUCCÈS !</h2>
+      <h2 id="reward-title" style="color:var(--gold);margin:0 0 8px;">BRAVO !</h2>
       <p id="reward-desc" style="color:#ddd;margin:0;white-space:pre-line;"></p>
-      <button class="btn" onclick="closeOverlay()">FERMER</button>
+      <button class="btn" onclick="closeOverlay()">GÉNIAL</button>
     </div>
   </div>
 
-  <!-- Modal Inscription -->
   <div id="register-modal">
     <div class="modal-box">
-      <p class="modal-title">INSCRIPTION</p>
-      <p style="color:#bbb;margin:0 0 10px;font-size:.92em;" id="register-hint">
-        Remplis tes infos pour activer le système.
-      </p>
-
+      <p style="color:var(--gold);font-weight:900;margin:0 0 10px;">VOTRE PROFIL</p>
       <div class="field">
-        <label>Je suis</label>
-        <select id="reg-gender">
-          <option value="mec">Mec</option>
-          <option value="fille">Fille</option>
-        </select>
+        <label style="font-size:.85em;color:#bbb;">Pseudo</label>
+        <input id="reg-name" placeholder="ex: Noeh" maxlength="20" />
       </div>
-
       <div class="field">
-        <label>Pseudo (obligatoire)</label>
-        <input id="reg-name" placeholder="ex: Noeh / MiniDividu" maxlength="20" />
+        <label style="font-size:.85em;color:#bbb;">Instagram (optionnel)</label>
+        <input id="reg-ig" placeholder="@toninsta" maxlength="30" />
       </div>
-
-      <div class="field">
-        <label>Instagram (optionnel)</label>
-        <input id="reg-ig" placeholder="ex: @toninsta" maxlength="30" />
-      </div>
-
-      <div class="modal-actions">
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
         <button class="btn dark" onclick="closeRegister()">Annuler</button>
         <button class="btn" onclick="saveRegister()">Valider</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal LOVE CODE -->
-  <div id="love-modal" style="position:fixed;inset:0;z-index:11500;display:none;background:rgba(0,0,0,.92);align-items:center;justify-content:center;padding:20px;">
-    <div style="width:92%;max-width:520px;background:#0f0f0f;border:1px solid #333;border-radius:18px;padding:18px;text-align:left;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-        <div>
-          <p style="margin:0;color:var(--love-pink);font-weight:900;letter-spacing:1px;">LOVE MATCH</p>
-          <p style="margin:6px 0 0;color:#aaa;font-size:.92em;" id="love-hint">
-            La fille génère un code. Le mec le rentre. Puis les 2 vont au bar.
-          </p>
-        </div>
-        <button class="btn dark" onclick="closeLove()" style="margin:0;">X</button>
-      </div>
-
-      <!-- Fille: génère -->
-      <div id="love-step-generate" style="margin-top:14px;display:none;">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
-          <div style="flex:1;min-width:220px;">
-            <p style="margin:0 0 8px;color:#bbb;font-weight:900;">TON CODE</p>
-            <div id="love-code" style="font-size:2.8em;font-weight:1000;letter-spacing:10px;color:#fff;background:#070707;border:1px solid #2a2a2a;border-radius:14px;padding:14px 18px;text-align:center;">
-              ----
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <button class="btn pink" onclick="generateLoveCode()">GÉNÉRER</button>
-            <button class="btn" onclick="copyLoveCode()">COPIER</button>
-          </div>
-        </div>
-
-        <p style="margin:12px 0 0;color:#777;font-size:.88em;">
-          Après génération : va au bar avec le mec (le bar scanne vos 2 BAR PASS).
-        </p>
-      </div>
-
-      <!-- Mec: entre -->
-      <div id="love-step-enter" style="margin-top:14px;display:none;">
-        <p style="margin:0 0 10px;color:#bbb;font-weight:900;">ENTRE LE CODE (4 chiffres)</p>
-        <input id="love-enter" inputmode="numeric" maxlength="4"
-               style="width:100%;font-size:1.6em;font-weight:900;letter-spacing:12px;text-align:center;background:#070707;border:1px solid #2a2a2a;color:#fff;border-radius:14px;padding:14px 12px;outline:none;"
-               placeholder="1234" />
-        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px;">
-          <button class="btn dark" onclick="closeLove()">Annuler</button>
-          <button class="btn pink" onclick="submitLoveCode()">MATCH</button>
-        </div>
-        <p style="margin:12px 0 0;color:#777;font-size:.88em;">
-          IMPORTANT : après le match, allez au bar. Le bar doit scanner vos 2 QR BAR PASS.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal BAR PASS (QR) -->
-  <div id="barpass-modal" style="position:fixed;inset:0;z-index:11600;display:none;background:rgba(0,0,0,.92);align-items:center;justify-content:center;padding:20px;">
-    <div style="width:92%;max-width:520px;background:#0f0f0f;border:1px solid #333;border-radius:18px;padding:18px;text-align:left;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-        <div>
-          <p style="margin:0;color:var(--gold);font-weight:900;letter-spacing:1px;">🎟️ BAR PASS</p>
-          <p style="margin:6px 0 0;color:#aaa;font-size:.92em;" id="barpass-hint">
-            Montre ce QR au bar. Le staff scanne 2 QR (mec + fille) pour valider le verre 2 pailles.
-          </p>
-        </div>
-        <button class="btn dark" onclick="closeBarPass()" style="margin:0;">X</button>
-      </div>
-
-      <div style="margin-top:14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
-        <img id="barpass-qr" alt="QR Bar Pass" style="width:220px;height:220px;border-radius:14px;border:1px solid #333;background:#000;" />
-        <div style="flex:1;min-width:220px;">
-          <p style="margin:0 0 8px;color:#bbb;font-weight:900;">Lien (backup)</p>
-          <textarea id="barpass-link" readonly style="width:100%;min-height:110px;background:#070707;border:1px solid #2a2a2a;color:#fff;border-radius:14px;padding:12px;font-weight:800;resize:none;"></textarea>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px;">
-            <button class="btn" onclick="copyBarPassLink()">COPIER</button>
-            <button class="btn pink" onclick="closeBarPass()">OK</button>
-          </div>
-        </div>
-      </div>
-
-      <p style="margin:12px 0 0;color:#777;font-size:.88em;">
-        La récompense est validée uniquement si le bar scanne les 2 BAR PASS (1 mec + 1 fille).
-      </p>
-    </div>
-  </div>
-
-  <!-- Modal MODE BAR -->
-  <div id="barmode-modal" style="position:fixed;inset:0;z-index:11700;display:none;background:rgba(0,0,0,.95);align-items:center;justify-content:center;padding:20px;">
-    <div style="width:92%;max-width:560px;background:#0f0f0f;border:1px solid #333;border-radius:18px;padding:18px;text-align:left;">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-        <div>
-          <p style="margin:0;color:var(--gold);font-weight:900;letter-spacing:1px;">🍸 MODE BAR</p>
-          <p style="margin:6px 0 0;color:#aaa;font-size:.92em;">
-            Scanner 2 QR BAR PASS : un mec + une fille, même match.
-          </p>
-        </div>
-        <button class="btn dark" onclick="closeBarMode()" style="margin:0;">X</button>
-      </div>
-
-      <div style="margin-top:14px;background:#070707;border:1px solid #2a2a2a;border-radius:14px;padding:12px;">
-        <p style="margin:0;color:#bbb;font-weight:900;">ÉTAT SCAN</p>
-        <p id="barmode-state" style="margin:8px 0 0;color:#fff;font-weight:1000;white-space:pre-line;">Aucun ticket scanné.</p>
-      </div>
-
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px;">
-        <button class="btn" onclick="barmodeReset()">RESET</button>
-        <button class="btn pink" onclick="barmodeRedeem()" id="barmode-redeem" disabled>REDEEM (VERRE 2 PAILLES)</button>
-      </div>
-
-      <p style="margin:12px 0 0;color:#777;font-size:.88em;">
-        Astuce bar : scannez via l’appareil photo → le lien ouvre cette page → ça auto-ajoute le ticket dans MODE BAR.
-      </p>
-    </div>
-  </div>
-
   <script>
-    /* =========================
-       1) DATA CARTES
-    ========================== */
     const CARD_DATA = [
-      // PUZZLES SHOTS
-      { id:'shots_s',  name:'S - SHOTS',    type:'puzzle' },
-      { id:'shots_h',  name:'H - SHOTS',    type:'puzzle' },
-      { id:'shots_o',  name:'O - SHOTS',    type:'puzzle' },
-      { id:'shots_t',  name:'T - SHOTS',    type:'puzzle' },
-      { id:'shots_s2', name:'S2 - SHOTS',   type:'puzzle' },
-
-      // PUZZLES DJ
-      { id:'dj_1', name:'MUSIQUE 1/3', type:'puzzle' },
-      { id:'dj_2', name:'MUSIQUE 2/3', type:'puzzle' },
-      { id:'dj_3', name:'MUSIQUE 3/3', type:'puzzle' },
-
-      // RARES
+      { id:'shots_1', name:'S - SHOTS', type:'puzzle' },
+      { id:'shots_2', name:'H - SHOTS', type:'puzzle' },
+      { id:'shots_3', name:'O - SHOTS', type:'puzzle' },
+      { id:'shots_4', name:'T - SHOTS', type:'puzzle' },
+      { id:'dj_1', name:'MUSIQUE 1/2', type:'puzzle' },
+      { id:'dj_2', name:'MUSIQUE 2/2', type:'puzzle' },
       { id:'bouteille_a', name:'BOUT. GAUCHE', type:'rare' },
       { id:'bouteille_b', name:'BOUT. DROITE', type:'rare' },
-      { id:'pompier',     name:'POMPIER/INF.', type:'rare' },
-      { id:'insta',       name:'INSTA STAFF',  type:'rare' },
-
-      // LÉGENDES
-      { id:'cocktail', name:'MIXOLOGUE',    type:'legend' },
-      { id:'escorte',  name:'ESCORTES VIP', type:'legend' },
-
-      // LOVE (cartes LOVE qui débloquent le match côté mec)
-      { id:'love_heart', name:'LOVE • HEART', type:'love' },
-      { id:'love_ring',  name:'LOVE • RING',  type:'love' }
+      { id:'pompier', name:'POMPIER', type:'rare' },
+      { id:'insta', name:'STAFF VIP', type:'rare' },
+      { id:'cocktail', name:'MIXOLOGUE', type:'legend' },
+      { id:'escorte', name:'ESCORTES', type:'legend' }
     ];
 
-    const STORAGE_CARDS   = 'cp9_cards';
+    const STORAGE_CARDS = 'cp9_cards';
     const STORAGE_PROFILE = 'cp9_profile';
 
-    // Love & Bar
-    const LOVE_STORAGE   = 'cp9_love_code';       // { code, expiresAt, ownerName }
-    const LOVE_PASS      = 'cp9_love_pass';       // { key, expiresAt, owner, role, partner? }
-    const BAR_REDEEMED   = 'cp9_bar_redeemed';    // [key,key,...] (sur tel bar)
-
     let collection = JSON.parse(localStorage.getItem(STORAGE_CARDS)) || [];
-    let profile    = JSON.parse(localStorage.getItem(STORAGE_PROFILE)) || null;
+    let profile = JSON.parse(localStorage.getItem(STORAGE_PROFILE)) || null;
 
-    /* =========================
-       2) UI GRILLES
-    ========================== */
     function initGrid(){
       const gridPuzzles = document.getElementById('grid-puzzles');
-      const gridExclu   = document.getElementById('grid-exclu');
+      const gridExclu = document.getElementById('grid-exclu');
       gridPuzzles.innerHTML = '';
       gridExclu.innerHTML = '';
 
-      CARD_DATA.forEach(card=>{
+      CARD_DATA.forEach(card => {
         const div = document.createElement('div');
         div.className = `card-item ${collection.includes(card.id) ? 'active' : ''}`;
-        div.id = 'card-' + card.id;
-
-        const placeholder = `https://via.placeholder.com/300/111/d4af37?text=${encodeURIComponent(card.id.toUpperCase())}`;
+        
+        const placeholder = `https://via.placeholder.com/300/111/d4af37?text=${card.id.toUpperCase()}`;
 
         div.innerHTML = `
           <span class="rarity-tag ${card.type}">${card.type}</span>
@@ -377,87 +205,38 @@
       });
 
       document.getElementById('count').innerText = collection.length;
-
-      const badge = document.getElementById('profile-badge');
-      if(profile){
-        badge.textContent = `Profil: ${profile.gender.toUpperCase()} • ${profile.name}${profile.ig ? ' • ' + profile.ig : ''}`;
-      } else {
-        badge.textContent = `Profil: non inscrit`;
-      }
+      if(profile) document.getElementById('profile-badge').textContent = `Profil: ${profile.name}`;
     }
 
-    /* =========================
-       3) PARAMS QR
-       - ?get=IDCARTE : ajoute carte
-       - ?action=register : ouvre inscription
-       - ?action=bar&ticket=... : scan bar pass
-    ========================== */
     function checkParams(){
       const urlParams = new URLSearchParams(window.location.search);
-      const action = urlParams.get('action');
-      const get = urlParams.get('get');
+      const getCard = urlParams.get('get');
 
-      if(action === 'register'){
-        openRegister('action-register');
-      }
-
-      if(get){
-        const id = String(get).trim();
-        const exists = CARD_DATA.some(c=>c.id === id);
-
-        if(!exists){
-          showOverlay("CARTE INCONNUE", `ID: ${id}\n(Ajoute-la dans CARD_DATA)`);
-          window.history.replaceState({}, document.title, window.location.pathname);
+      if(getCard){
+        const card = CARD_DATA.find(c => c.id === getCard);
+        if(!card){
+          alert("Carte inconnue");
           return;
         }
 
-        const isNew = !collection.includes(id);
-        if(isNew){
-          collection.push(id);
+        if(!collection.includes(getCard)){
+          collection.push(getCard);
           localStorage.setItem(STORAGE_CARDS, JSON.stringify(collection));
           runConfetti();
-          showReward(id);
-
-          // si carte LOVE et pas inscrit -> inscription obligatoire (pour forcer data)
-          if(isLoveCard(id) && !profile){
-            openRegister('love-scan-required');
-          }
+          showReward(card);
         } else {
-          showOverlay("DÉJÀ DÉBLOQUÉE", `Tu as déjà la carte ${id.toUpperCase()}.`);
-          window.history.replaceState({}, document.title, window.location.pathname);
+          showOverlay("DÉJÀ POSSÉDÉE", `Tu as déjà la carte ${card.name}.`);
         }
+        // Nettoie l'URL
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
 
-    function isLoveCard(id){
-      const card = CARD_DATA.find(c=>c.id === id);
-      return card && card.type === 'love';
-    }
-
-    /* =========================
-       4) OVERLAY REWARD
-    ========================== */
-    function showReward(id){
+    function showReward(card){
       const overlay = document.getElementById('reward-overlay');
-      const title = document.getElementById('reward-title');
-      const desc = document.getElementById('reward-desc');
-
-      const card = CARD_DATA.find(c=>c.id===id);
-
-      overlay.style.display='flex';
-      title.innerText = "CARTE DÉBLOQUÉE !";
-
-      let text = `Tu as obtenu : ${card ? card.name : id.toUpperCase()}.\nTrouve les autres pièces ou va au bar.`;
-
-      if(id.includes('bouteille')){
-        text = "PIÈCE DE BOUTEILLE !\nTrouve l'autre moitié ou échange-la contre 2 verres au bar.";
-      }
-
-      if(isLoveCard(id)){
-        text = "CARTE LOVE !\nTu peux lancer LOVE MATCH (si t’es inscrit).";
-      }
-
-      desc.innerText = text;
+      document.getElementById('reward-title').innerText = "NOUVELLE CARTE !";
+      document.getElementById('reward-desc').innerText = `Tu as débloqué : ${card.name}\n\nContinue la collection pour gagner des verres !`;
+      overlay.style.display = 'flex';
       initGrid();
     }
 
@@ -465,466 +244,68 @@
       const overlay = document.getElementById('reward-overlay');
       document.getElementById('reward-title').innerText = t;
       document.getElementById('reward-desc').innerText = d;
-      overlay.style.display='flex';
+      overlay.style.display = 'flex';
     }
 
     function closeOverlay(){
-      document.getElementById('reward-overlay').style.display='none';
-      window.history.replaceState({}, document.title, window.location.pathname);
-      initGrid();
+      document.getElementById('reward-overlay').style.display = 'none';
     }
 
-    /* =========================
-       5) INSCRIPTION (Capture Data Pro)
-    ========================== */
-    function openRegister(reason){
-      const modal = document.getElementById('register-modal');
-      const hint = document.getElementById('register-hint');
-
-      if(reason === 'action-register'){
-        hint.textContent = "Inscription rapide : tu as scanné l’entrée (register).";
-      } else if(reason === 'love-scan-required'){
-        hint.textContent = "Carte LOVE détectée : inscription obligatoire pour activer le Love Match.";
-      } else if(reason === 'love-click-required'){
-        hint.textContent = "Pour lancer le Love Match, tu dois être inscrit.";
-      } else {
-        hint.textContent = "Remplis tes infos pour activer le système.";
-      }
-
-      modal.style.display = 'flex';
+    function openRegister(){
+      document.getElementById('register-modal').style.display = 'flex';
     }
 
     function closeRegister(){
-      document.getElementById('register-modal').style.display='none';
+      document.getElementById('register-modal').style.display = 'none';
     }
 
     function saveRegister(){
-      const gender = document.getElementById('reg-gender').value;
       const name = document.getElementById('reg-name').value.trim();
       const ig = document.getElementById('reg-ig').value.trim();
+      if(!name) return alert("Pseudo requis");
 
-      if(!name){
-        alert("Pseudo obligatoire.");
-        return;
-      }
-
-      profile = { gender, name, ig: ig || '', createdAt: Date.now() };
+      profile = { name, ig };
       localStorage.setItem(STORAGE_PROFILE, JSON.stringify(profile));
-
       closeRegister();
       initGrid();
-      runConfetti();
-      showOverlay("INSCRIPTION OK", `Bienvenue ${name} ✅`);
     }
 
-    /* =========================
-       6) LOVE MATCH (Code 4 chiffres)
-       Règle:
-       - FILLE : génère un code (crée aussi son BAR PASS)
-       - MEC : doit être inscrit + avoir au moins 1 carte LOVE, rentre le code
-       - MATCH OK : crée le BAR PASS du mec
-       IMPORTANT : la récompense se fait AU BAR en scannant 2 BAR PASS.
-    ========================== */
-    function openLoveCode(){
-      if(!profile){
-        openRegister('love-click-required');
-        return;
-      }
-
-      const modal = document.getElementById('love-modal');
-      const hint = document.getElementById('love-hint');
-      const stepGen = document.getElementById('love-step-generate');
-      const stepEnter = document.getElementById('love-step-enter');
-
-      if(profile.gender === 'fille'){
-        hint.textContent = "Tu génères un code. Le mec le rentre. Puis vous allez au bar (scan 2 BAR PASS).";
-        stepGen.style.display = 'block';
-        stepEnter.style.display = 'none';
-
-        // affiche code existant si encore valide
-        const saved = JSON.parse(localStorage.getItem(LOVE_STORAGE) || 'null');
-        if(saved && Date.now() < saved.expiresAt){
-          document.getElementById('love-code').textContent = saved.code;
-        } else {
-          document.getElementById('love-code').textContent = '----';
-        }
-      } else {
-        // mec doit avoir une carte LOVE
-        const hasLove = collection.some(id => isLoveCard(id));
-        if(!hasLove){
-          showOverlay("LOVE MATCH BLOQUÉ", "Il te faut au moins 1 CARTE LOVE pour matcher.");
-          return;
-        }
-        hint.textContent = "Demande le code à la fille. Après match, vous allez au bar (scan 2 BAR PASS).";
-        stepGen.style.display = 'none';
-        stepEnter.style.display = 'block';
-        document.getElementById('love-enter').value = '';
-      }
-
-      modal.style.display = 'flex';
-    }
-
-    function closeLove(){
-      document.getElementById('love-modal').style.display = 'none';
-    }
-
-    function generateLoveCode(){
-      if(!profile || profile.gender !== 'fille'){
-        showOverlay("INTERDIT", "Seule une fille peut générer un code.");
-        return;
-      }
-      const code = String(Math.floor(1000 + Math.random()*9000));
-      const expiresAt = Date.now() + 2*60*1000; // 2 minutes (pas de compte à rebours affiché)
-
-      localStorage.setItem(LOVE_STORAGE, JSON.stringify({
-        code, expiresAt,
-        ownerName: profile.name || 'Fille'
-      }));
-
-      // BAR PASS pour la fille (même clé)
-      localStorage.setItem(LOVE_PASS, JSON.stringify({
-        key: code,
-        expiresAt,
-        owner: profile.name || 'Fille',
-        role: profile.gender
-      }));
-
-      document.getElementById('love-code').textContent = code;
-      runConfetti();
-      showOverlay("CODE CRÉÉ", "Code généré ✅\nAprès le match : allez au bar (scan 2 BAR PASS).");
-    }
-
-    function copyLoveCode(){
-      const code = document.getElementById('love-code').textContent.trim();
-      if(code === '----') return alert("Génère un code d’abord.");
-      navigator.clipboard?.writeText(code);
-      showOverlay("COPIÉ", "Code copié ✅");
-    }
-
-    function submitLoveCode(){
-      if(!profile || profile.gender !== 'mec'){
-        showOverlay("INTERDIT", "Seul un mec rentre le code.");
-        return;
-      }
-
-      // mec doit avoir carte LOVE
-      const hasLove = collection.some(id => isLoveCard(id));
-      if(!hasLove){
-        showOverlay("BLOQUÉ", "Il te faut au moins 1 CARTE LOVE.");
-        return;
-      }
-
-      const entered = (document.getElementById('love-enter').value || '').trim();
-      if(!/^\d{4}$/.test(entered)){
-        alert("Entre 4 chiffres.");
-        return;
-      }
-
-      const saved = JSON.parse(localStorage.getItem(LOVE_STORAGE) || 'null');
-      if(!saved){
-        showOverlay("ECHEC", "Aucun code actif. Demande à la fille de générer.");
-        return;
-      }
-      if(Date.now() > saved.expiresAt){
-        showOverlay("EXPIRÉ", "Le code a expiré. Demande un nouveau code.");
-        return;
-      }
-      if(entered !== saved.code){
-        showOverlay("MAUVAIS CODE", "Essaie encore.");
-        return;
-      }
-
-      // MATCH OK -> BAR PASS pour le mec
-      localStorage.setItem(LOVE_PASS, JSON.stringify({
-        key: saved.code,
-        expiresAt: saved.expiresAt,
-        owner: profile.name || 'Mec',
-        role: profile.gender,
-        partner: saved.ownerName || 'Fille'
-      }));
-
-      closeLove();
-      runConfetti();
-      showOverlay("💘 MATCH RÉUSSI", "Match validé ✅\nMAINTENANT : allez au bar.\nLe bar doit scanner les 2 BAR PASS pour le verre 2 pailles.");
-      // ouvre le BAR PASS direct
-      openBarPass();
-    }
-
-    /* =========================
-       7) BAR PASS (QR)
-       - chaque personne a son pass (clé = code)
-       - au bar: scan 2 passes (mec + fille) -> redeem
-    ========================== */
-    function baseUrl(){
-      return window.location.origin + window.location.pathname;
-    }
-
-    function buildBarTicket(){
-      const pass = JSON.parse(localStorage.getItem(LOVE_PASS) || 'null');
-      if(!pass) return null;
-      if(Date.now() > pass.expiresAt) return null;
-
-      return {
-        v: 1,
-        key: pass.key,
-        exp: pass.expiresAt,
-        name: profile?.name || pass.owner || 'Unknown',
-        role: profile?.gender || pass.role || 'unknown'
-      };
-    }
-
-    function ticketToUrl(ticket){
-      const payload = btoa(unescape(encodeURIComponent(JSON.stringify(ticket))));
-      return `${baseUrl()}?action=bar&ticket=${encodeURIComponent(payload)}`;
-    }
-
-    function openBarPass(){
-      if(!profile){
-        openRegister('love-click-required');
-        return;
-      }
-      const ticket = buildBarTicket();
-      if(!ticket){
-        showOverlay("BAR PASS INDISPONIBLE", "Pas de match actif / expiré.\nRefais un Love Match.");
-        return;
-      }
-
-      const link = ticketToUrl(ticket);
-
-      // QR via service simple (tu peux remplacer par ton propre générateur plus tard)
-      const qrImg = document.getElementById('barpass-qr');
-      const linkBox = document.getElementById('barpass-link');
-
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(link)}`;
-      linkBox.value = link;
-
-      document.getElementById('barpass-modal').style.display = 'flex';
-    }
-
-    function closeBarPass(){
-      document.getElementById('barpass-modal').style.display = 'none';
-    }
-
-    function copyBarPassLink(){
-      const text = document.getElementById('barpass-link').value;
-      navigator.clipboard?.writeText(text);
-      showOverlay("COPIÉ", "Lien Bar Pass copié ✅");
-    }
-
-    /* =========================
-       8) MODE BAR (staff)
-       Le bar scanne 2 QR:
-       - même key
-       - 1 mec + 1 fille
-       - pas expiré
-       - pas déjà redeem sur ce tel bar
-    ========================== */
-    let barScanA = null;
-    let barScanB = null;
-
-    function enterBarMode(){
-      document.getElementById('barmode-modal').style.display = 'flex';
-      updateBarState();
-    }
-
-    function closeBarMode(){
-      document.getElementById('barmode-modal').style.display = 'none';
-    }
-
-    function barmodeReset(){
-      barScanA = null;
-      barScanB = null;
-      updateBarState();
-    }
-
-    function getRedeemed(){
-      return JSON.parse(localStorage.getItem(BAR_REDEEMED) || '[]');
-    }
-    function setRedeemed(arr){
-      localStorage.setItem(BAR_REDEEMED, JSON.stringify(arr));
-    }
-
-    function updateBarState(){
-      const state = document.getElementById('barmode-state');
-      const btn = document.getElementById('barmode-redeem');
-
-      if(!barScanA && !barScanB){
-        state.textContent = "Aucun ticket scanné.\nScan 1er QR (mec OU fille).";
-        btn.disabled = true;
-        return;
-      }
-      if(barScanA && !barScanB){
-        state.textContent = `1/2 OK : ${barScanA.role.toUpperCase()} • ${barScanA.name}\nScan le 2ème QR (l'autre personne).`;
-        btn.disabled = true;
-        return;
-      }
-
-      const okSameKey = barScanA.key === barScanB.key;
-      const okNotExpired = Date.now() <= Math.min(barScanA.exp, barScanB.exp);
-      const rolesDifferent = barScanA.role !== barScanB.role;
-      const already = getRedeemed().includes(barScanA.key);
-
-      if(already){
-        state.textContent = "REFUS ❌ : Déjà redeem sur ce téléphone bar.";
-        btn.disabled = true;
-        return;
-      }
-      if(!okSameKey){
-        state.textContent = "REFUS ❌ : Les 2 QR ne correspondent pas au même match.";
-        btn.disabled = true;
-        return;
-      }
-      if(!okNotExpired){
-        state.textContent = "REFUS ❌ : Match expiré.";
-        btn.disabled = true;
-        return;
-      }
-      if(!rolesDifferent){
-        state.textContent = "REFUS ❌ : Il faut 1 MEC + 1 FILLE (pas 2 mêmes).";
-        btn.disabled = true;
-        return;
-      }
-
-      state.textContent = `OK ✅ : ${barScanA.name} + ${barScanB.name}\nVerre 2 pailles prêt à REDEEM.`;
-      btn.disabled = false;
-    }
-
-    function barmodeRedeem(){
-      if(!barScanA || !barScanB) return;
-
-      const redeemed = getRedeemed();
-      redeemed.push(barScanA.key);
-      setRedeemed(redeemed);
-
-      runConfetti();
-      showOverlay("🍸 REDEEM OK", "Récompense validée : 1 verre • 2 pailles ✅");
-      barmodeReset();
-    }
-
-    function handleBarTicketFromUrl(){
-      const p = new URLSearchParams(window.location.search);
-      const action = p.get('action');
-      const t = p.get('ticket');
-      if(action !== 'bar' || !t) return;
-
-      // ouvre mode bar
-      enterBarMode();
-
-      try{
-        const json = decodeURIComponent(escape(atob(decodeURIComponent(t))));
-        const ticket = JSON.parse(json);
-
-        if(!ticket?.key || !ticket?.exp || !ticket?.role){
-          showOverlay("TICKET INVALIDE", "QR incorrect.");
-          return;
-        }
-
-        if(!barScanA) barScanA = ticket;
-        else barScanB = ticket;
-
-        updateBarState();
-      }catch(e){
-        showOverlay("ERREUR", "Impossible de lire le ticket.");
-      }
-
-      // clean url
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    /* =========================
-       9) RESET
-    ========================== */
     function resetAll(){
-      if(!confirm("Tout reset ? Cartes + Profil + Love Pass + Redeem Bar")) return;
-      localStorage.removeItem(STORAGE_CARDS);
-      localStorage.removeItem(STORAGE_PROFILE);
-      localStorage.removeItem(LOVE_STORAGE);
-      localStorage.removeItem(LOVE_PASS);
-      localStorage.removeItem(BAR_REDEEMED);
-      collection = [];
-      profile = null;
-      barScanA = null;
-      barScanB = null;
-      initGrid();
-      showOverlay("RESET OK", "Tout a été supprimé.");
+      if(confirm("Supprimer ta collection ?")){
+        localStorage.clear();
+        location.reload();
+      }
     }
 
-    /* =========================
-       10) CONFETTI (canvas simple)
-    ========================== */
+    // --- CONFETTI ---
     const confettiCanvas = document.getElementById('confetti');
     const ctx = confettiCanvas.getContext('2d');
-
-    function resizeCanvas(){
-      confettiCanvas.width = window.innerWidth;
-      confettiCanvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    function resize(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+    window.onresize = resize; resize();
 
     function runConfetti(){
       const W = confettiCanvas.width, H = confettiCanvas.height;
       const pieces = [];
-      const count = 140;
-
-      for(let i=0;i<count;i++){
+      for(let i=0; i<100; i++){
         pieces.push({
-          x: Math.random()*W,
-          y: -20 - Math.random()*H*0.2,
-          r: 3 + Math.random()*6,
-          vx: -2 + Math.random()*4,
-          vy: 2 + Math.random()*5,
-          a: Math.random()*Math.PI*2,
-          va: -0.2 + Math.random()*0.4,
-          life: 0,
-          max: 80 + Math.floor(Math.random()*40),
-          c: ['#d4af37','#ff4fa3','#0077b6','#b30000','#ffffff'][Math.floor(Math.random()*5)]
+          x: Math.random()*W, y: -20, r: 5+Math.random()*5,
+          vx: -2+Math.random()*4, vy: 2+Math.random()*5,
+          c: ['#d4af37','#0077b6','#ffffff'][Math.floor(Math.random()*3)]
         });
       }
-
-      let frame = 0;
       function tick(){
-        frame++;
         ctx.clearRect(0,0,W,H);
-
-        pieces.forEach(p=>{
-          p.life++;
-          p.x += p.vx;
-          p.y += p.vy;
-          p.a += p.va;
-          p.vy += 0.03;
-
-          ctx.save();
-          ctx.translate(p.x,p.y);
-          ctx.rotate(p.a);
+        pieces.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.vy += 0.02;
           ctx.fillStyle = p.c;
-          ctx.fillRect(-p.r, -p.r, p.r*2, p.r*2);
-          ctx.restore();
+          ctx.fillRect(p.x, p.y, p.r, p.r);
         });
-
-        for(let i=pieces.length-1;i>=0;i--){
-          if(pieces[i].life > pieces[i].max || pieces[i].y > H+50){
-            pieces.splice(i,1);
-          }
-        }
-
-        if(frame < 120 && pieces.length){
-          requestAnimationFrame(tick);
-        } else {
-          ctx.clearRect(0,0,W,H);
-        }
+        if(pieces.some(p => p.y < H)) requestAnimationFrame(tick);
       }
       tick();
     }
 
-    /* =========================
-       INIT
-    ========================== */
-    window.onload = ()=>{
-      initGrid();
-      checkParams();
-      handleBarTicketFromUrl();
-    };
+    window.onload = () => { initGrid(); checkParams(); };
   </script>
 </body>
 </html>
