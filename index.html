@@ -91,7 +91,13 @@
     </div>
   </div>
 
-  <div id="reward-overlay"><div class="modal-box"><h2 id="reward-title" style="color:var(--gold);">BRAVO !</h2><p id="reward-desc"></p><button class="btn" onclick="closeOverlay()">GÉNIAL</button></div></div>
+  <div id="reward-overlay">
+    <div class="modal-box">
+      <h2 id="reward-title" style="color:var(--gold);">BRAVO !</h2>
+      <p id="reward-desc"></p>
+      <button class="btn" onclick="closeOverlay()">GÉNIAL</button>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -116,7 +122,6 @@
 
     async function renderAll(filterBarId = null) {
         if (allCardsCache.length === 0) {
-            // Récupère les cartes depuis la base de données
             const { data } = await supabase.from('cards').select('*').order('slot_index');
             allCardsCache = data || [];
         }
@@ -173,6 +178,7 @@
             if (!currentUser) return (sessionStorage.setItem('pending_ticket', code), openRegister());
             const { data: t } = await supabase.from('qr_tickets').select('*, cards(*)').eq('id', code).single();
             if (!t || t.is_used) return alert("Code invalide ou utilisé.");
+            
             const { error } = await supabase.from('user_cards').insert([{ user_id: currentUser.id, card_id: t.card_id }]);
             if (!error) {
                 await supabase.from('qr_tickets').update({ is_used: true, used_by: currentUser.id }).eq('id', code);
