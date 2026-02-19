@@ -1,0 +1,63 @@
+:root {
+    --gold: #d4af37;
+    --rare-red: #b30000;
+    --puzzle-blue: #0077b6;
+    --bg-dark: #0a0a0a;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg-dark);
+    color: #fff;
+    margin: 0; padding: 0; text-align: center;
+}
+
+.header {
+    background: linear-gradient(to bottom, #1a1a1a, #000);
+    padding: 40px 20px; border-bottom: 2px solid var(--gold);
+}
+
+h1 { margin: 0; letter-spacing: 5px; color: var(--gold); text-transform: uppercase; }
+
+.status-panel {
+    background: #111; margin: 20px; padding: 15px; border-radius: 15px; border: 1px solid #333;
+    display: flex; align-items: center; justify-content: space-between;
+}
+
+.gold-text { color: var(--gold); font-weight: 900; }
+.puzzle-title { color: var(--puzzle-blue); }
+.rare-title { color: var(--rare-red); }
+.bar-title { color: #28a745; }
+
+.card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; padding: 20px; }
+
+.card-item {
+    background: #151515; border: 2px solid #222; border-radius: 12px; overflow: hidden; 
+    position: relative; transition: all .35s ease; filter: grayscale(100%) brightness(50%);
+}
+
+.card-item.active { border-color: var(--gold); filter: grayscale(0%) brightness(100%); transform: translateY(-5px); }
+
+/* Animation spécifique Bars */
+.card-item.type-bar { cursor: pointer; filter: none !important; border-color: #28a745; animation: pulse-bar 2s infinite; }
+.card-item.type-bar:hover { transform: scale(1.1) rotate(2deg); box-shadow: 0 0 20px rgba(40, 167, 69, 0.6); z-index: 100; }
+
+.card-item img { width: 100%; display: block; }
+.card-label { font-size: .65em; padding: 8px 2px; font-weight: 900; background: #000; }
+
+.pill { border: 1px solid #333; background: #0d0d0d; color: #fff; padding: 10px 14px; border-radius: 999px; cursor: pointer; }
+.pill.gold { background: var(--gold); color: #000; border: none; }
+
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,.95); z-index: 10000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+.modal-box { width: 92%; max-width: 420px; border: 2px solid var(--gold); border-radius: 20px; padding: 20px; background: #111; }
+
+.btn { background: var(--gold); border: none; padding: 12px; border-radius: 10px; font-weight: 900; cursor: pointer; width: 100%; margin-top: 10px; }
+.btn.secondary { background: #222; color: #fff; }
+
+@keyframes pulse-bar {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 12000; }
