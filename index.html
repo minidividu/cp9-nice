@@ -13,86 +13,76 @@
     }
     body{
       font-family:'Segoe UI',Roboto,sans-serif;
-      background:var(--bg-dark);
-      color:#fff;
-      margin:0;padding:0;text-align:center;
+      background:var(--bg-dark); color:#fff; margin:0; padding:0; text-align:center;
     }
     .header{
       background:linear-gradient(to bottom,#1a1a1a,#000);
-      padding:40px 20px;
-      border-bottom:2px solid var(--gold);
+      padding:40px 20px; border-bottom:2px solid var(--gold);
     }
-    h1{margin:0;letter-spacing:5px;color:var(--gold);font-size:2.2em;text-transform:uppercase;}
+    h1{margin:0; letter-spacing:5px; color:var(--gold); font-size:2.2em; text-transform:uppercase;}
 
     .status-panel{
-      background:#111;margin:20px;padding:15px;border-radius:15px;border:1px solid #333;
-      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      background:#111; margin:20px; padding:15px; border-radius:15px; border:1px solid #333;
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
     }
-    .status-left{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;}
-    .status-right{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+    .status-left{display:flex; flex-direction:column; align-items:flex-start; text-align:left; gap:6px;}
 
     .pill{
-      border:1px solid #333;background:#0d0d0d;color:#fff;
-      padding:10px 14px;border-radius:999px;font-weight:800;cursor:pointer;
+      border:1px solid #333; background:#0d0d0d; color:#fff;
+      padding:10px 14px; border-radius:999px; font-weight:800; cursor:pointer;
     }
-    .pill.gold{background:var(--gold);color:#000;border:none;}
+    .pill.gold{background:var(--gold); color:#000; border:none;}
 
     .card-container{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
-      gap:12px;padding:20px;
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+      gap:12px; padding:20px;
     }
     .card-item{
-      background:#151515;border:2px solid #222;border-radius:12px;overflow:hidden;position:relative;
-      transition:all .35s ease;
-      filter:grayscale(100%) brightness(50%);
+      background:#151515; border:2px solid #222; border-radius:12px; overflow:hidden; position:relative;
+      transition:all .35s ease; filter:grayscale(100%) brightness(50%);
     }
     .card-item.active{
-      border-color:var(--gold);
-      filter:grayscale(0%) brightness(100%);
-      box-shadow:0 0 15px rgba(212,175,55,.3);
-      transform:translateY(-5px);
+      border-color:var(--gold); filter:grayscale(0%) brightness(100%);
+      box-shadow:0 0 15px rgba(212,175,55,.3); transform:translateY(-5px);
     }
-    .card-item img{width:100%;display:block;}
-    .card-label{font-size:.65em;padding:8px 2px;font-weight:900;background:#000;}
+    .card-item img{width:100%; display:block;}
+    .card-label{font-size:.65em; padding:8px 2px; font-weight:900; background:#000;}
 
     .rarity-tag{
-      position:absolute;top:6px;left:6px;
-      font-size:.55em;padding:3px 6px;border-radius:4px;text-transform:uppercase;z-index:10;
+      position:absolute; top:6px; left:6px; font-size:.55em; padding:3px 6px; 
+      border-radius:4px; text-transform:uppercase; z-index:10;
     }
-    .legend{background:var(--gold);color:#000;}
-    .rare{background:var(--rare-red);}
     .puzzle{background:var(--puzzle-blue);}
+    .rare{background:var(--rare-red);}
 
-    #reward-overlay{
-      position:fixed;top:0;left:0;width:100%;height:100%;
-      background:rgba(0,0,0,.95);z-index:10000;display:none;
-      flex-direction:column;justify-content:center;align-items:center;padding:20px;
+    /* REWARDS SECTION */
+    .reward-list { padding: 20px; }
+    .reward-card {
+      background: #1a1a1a; border-left: 4px solid var(--gold);
+      padding: 15px; margin-bottom: 10px; border-radius: 8px;
+      display: flex; justify-content: space-between; align-items: center; text-align: left;
     }
-    .reward-box{
-      width:92%;max-width:420px;
-      border:3px solid var(--gold);border-radius:20px;padding:18px;background:#111;text-align:center;
+    .reward-card.used { opacity: 0.5; border-color: #555; filter: grayscale(1); }
+
+    /* OVERLAYS */
+    #reward-overlay, #register-modal {
+      position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:10000; 
+      display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px;
+    }
+    .modal-box {
+      width:92%; max-width:420px; border:2px solid var(--gold); border-radius:20px;
+      padding:20px; background:#111; text-align:center;
+    }
+    .field{display:flex; flex-direction:column; gap:6px; margin:10px 0; text-align: left;}
+    .field input{
+      background:#070707; border:1px solid #2a2a2a; color:#fff; border-radius:12px;
+      padding:12px; font-weight:800; outline:none;
     }
     .btn{
-      background:var(--gold);border:none;padding:10px 16px;border-radius:10px;
-      font-weight:900;cursor:pointer;margin-top:12px;
+      background:var(--gold); border:none; padding:12px 20px; border-radius:10px;
+      font-weight:900; cursor:pointer; margin-top:12px; width: 100%;
     }
-    .btn.dark{background:#222;color:#fff;border:1px solid #333;}
-
-    #register-modal{
-      position:fixed;inset:0;z-index:11000;display:none;
-      background:rgba(0,0,0,.92);align-items:center;justify-content:center;padding:20px;
-    }
-    .modal-box{
-      width:92%;max-width:460px;background:#0f0f0f;border:1px solid #333;border-radius:18px;
-      padding:18px;text-align:left;
-    }
-    .field{display:flex;flex-direction:column;gap:6px;margin:10px 0;}
-    .field input{
-      background:#070707;border:1px solid #2a2a2a;color:#fff;border-radius:12px;
-      padding:12px;font-weight:800;outline:none;
-    }
-    #confetti{position:fixed;inset:0;pointer-events:none;z-index:12000;}
+    #confetti{position:fixed; inset:0; pointer-events:none; z-index:12000;}
   </style>
 </head>
 
@@ -101,245 +91,199 @@
 
   <div class="header">
     <h1>CP9 SQUADRA</h1>
-    <p style="color:#888;font-size:.9em;margin:10px 0 0;">NICE NIGHTLIFE • COLLECTION</p>
+    <p style="color:#888; font-size:.9em; margin:10px 0 0;">NICE NIGHTLIFE • COLLECTION</p>
   </div>
 
   <div class="status-panel">
     <div class="status-left">
-      <div style="color:var(--gold);font-weight:900;">VOTRE COLLECTION</div>
-      <div style="font-size:1.5em;font-weight:900;"><span id="count">0</span> / <span id="total-available">12</span></div>
-      <div id="profile-badge" style="color:#aaa;font-size:.85em;">Chargement...</div>
+      <div style="color:var(--gold); font-weight:900;">VOTRE COLLECTION</div>
+      <div style="font-size:1.5em; font-weight:900;"><span id="count">0</span> / <span id="total-available">12</span></div>
+      <div id="profile-badge" style="color:#aaa; font-size:.85em;">Chargement...</div>
     </div>
-    <div class="status-right" id="auth-controls">
-      </div>
+    <div id="auth-controls"></div>
   </div>
 
-  <h3 style="color:var(--puzzle-blue);margin:10px 0 0;">🧩 PUZZLES</h3>
+  <h3 style="color:var(--puzzle-blue); margin-top: 30px;">🧩 MES PUZZLES</h3>
   <div class="card-container" id="grid-puzzles"></div>
 
-  <h3 style="color:var(--rare-red);margin:10px 0 0;">💎 CARTES RARES</h3>
+  <h3 style="color:var(--rare-red);">💎 MES RARETÉS</h3>
   <div class="card-container" id="grid-exclu"></div>
 
+  <hr style="border:0; border-top:1px solid #333; margin: 40px 20px;">
+
+  <h3 style="color:var(--gold);">🎁 MES RÉCOMPENSES</h3>
+  <div class="reward-list" id="reward-list">
+    <p style="color: #666;">Scanne tes premières cartes pour débloquer des cadeaux !</p>
+  </div>
+
   <div id="reward-overlay">
-    <div class="reward-box">
-      <h2 id="reward-title" style="color:var(--gold);margin:0 0 8px;">BRAVO !</h2>
-      <p id="reward-desc" style="color:#ddd;margin:0;white-space:pre-line;"></p>
+    <div class="modal-box">
+      <h2 id="reward-title" style="color:var(--gold); margin:0 0 8px;">BRAVO !</h2>
+      <p id="reward-desc" style="color:#ddd; margin:0; white-space:pre-line;"></p>
       <button class="btn" onclick="closeOverlay()">GÉNIAL</button>
     </div>
   </div>
 
   <div id="register-modal">
     <div class="modal-box">
-      <p id="modal-title" style="color:var(--gold);font-weight:900;margin:0 0 10px;">REJOINDRE LA SQUADRA</p>
+      <h2 style="color:var(--gold);">REJOINDRE LA SQUADRA</h2>
       <div class="field">
-        <label style="font-size:.85em;color:#bbb;">Email (pour sauvegarder ta collec)</label>
+        <label>Email</label>
         <input id="reg-email" type="email" placeholder="ton@email.com" />
       </div>
       <div class="field">
-        <label style="font-size:.85em;color:#bbb;">Mot de passe</label>
+        <label>Mot de passe</label>
         <input id="reg-pass" type="password" placeholder="******" />
       </div>
-      <div id="extra-fields">
-          <div class="field">
-            <label style="font-size:.85em;color:#bbb;">Pseudo Instagram</label>
-            <input id="reg-pseudo" placeholder="@toninsta" />
-          </div>
-      </div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
-        <button class="btn dark" onclick="closeRegister()">Annuler</button>
-        <button class="btn" id="auth-submit-btn" onclick="handleAuth()">Valider</button>
-      </div>
+      <button class="btn" onclick="handleAuth()">VALIDER</button>
+      <button class="btn" style="background:#222; color:#fff;" onclick="closeRegister()">ANNULER</button>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <script>
-    // --- CONFIGURATION (À REMPLACER) ---
-    const SUPABASE_URL = 'https://VOTRE_PROJET.supabase.co';
-    const SUPABASE_KEY = 'VOTRE_ANON_KEY';
+    // --- CONNEXION SUPABASE ---
+    const SUPABASE_URL = 'https://qqtbaxaomrophaiszwtr.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_SqgX_Vzxas58tEQwuvlUaQ_TrXaMNWd'; //
     const supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null;
-    let userOwnedCards = []; // Liste des card_id possédés
+    let isAdmin = false;
 
-    // --- INITIALISATION ---
     async function initApp() {
         const { data: { session } } = await supabase.auth.getSession();
         currentUser = session?.user || null;
+        
+        if (currentUser) {
+            // Vérifier si l'utilisateur est admin
+            const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).single();
+            isAdmin = profile?.is_admin || false;
+        }
+
         updateAuthUI();
-        await fetchAndRenderCards();
-        checkParams();
+        await renderAll();
+        checkScanTicket();
     }
 
     function updateAuthUI() {
         const container = document.getElementById('auth-controls');
         const badge = document.getElementById('profile-badge');
-        
         if (currentUser) {
             badge.textContent = `Profil: ${currentUser.email}`;
-            container.innerHTML = `<button class="pill" onclick="handleLogout()">DÉCONNEXION</button>`;
+            container.innerHTML = `<button class="pill" onclick="handleLogout()">DECO</button>`;
         } else {
             badge.textContent = `Profil: non inscrit`;
-            container.innerHTML = `<button class="pill gold" onclick="openRegister()">📝 S’INSCRIRE</button>`;
+            container.innerHTML = `<button class="pill gold" onclick="openRegister()">S’INSCRIRE</button>`;
         }
     }
 
-    async function fetchAndRenderCards() {
-        // 1. Charger toutes les cartes du catalogue
+    async function renderAll() {
+        // 1. Charger les cartes
         const { data: allCards } = await supabase.from('cards').select('*').order('slot_index');
-        
-        // 2. Charger les cartes possédées par l'user
+        let ownedIds = [];
         if (currentUser) {
-            const { data: owned } = await supabase
-                .from('user_cards')
-                .select('card_id')
-                .eq('user_id', currentUser.id);
-            userOwnedCards = owned ? owned.map(c => c.card_id) : [];
+            const { data: owned } = await supabase.from('user_cards').select('card_id').eq('user_id', currentUser.id);
+            ownedIds = owned ? owned.map(c => c.card_id) : [];
         }
 
-        const gridPuzzles = document.getElementById('grid-puzzles');
-        const gridExclu = document.getElementById('grid-exclu');
-        gridPuzzles.innerHTML = ''; gridExclu.innerHTML = '';
+        // Rendu Grille
+        const grids = { puzzle: document.getElementById('grid-puzzles'), rare: document.getElementById('grid-exclu') };
+        grids.puzzle.innerHTML = ''; grids.rare.innerHTML = '';
         
-        if (allCards) {
-            document.getElementById('total-available').innerText = allCards.length;
-            document.getElementById('count').innerText = userOwnedCards.length;
+        allCards?.forEach(card => {
+            const div = document.createElement('div');
+            div.className = `card-item ${ownedIds.includes(card.id) ? 'active' : ''}`;
+            div.innerHTML = `<span class="rarity-tag ${card.type}">${card.type}</span>
+                             <img src="https://via.placeholder.com/300/111/d4af37?text=${card.name.split(' ')[0]}">
+                             <div class="card-label">${card.name}</div>`;
+            grids[card.type === 'puzzle' ? 'puzzle' : 'rare'].appendChild(div);
+        });
+        document.getElementById('count').innerText = ownedIds.length;
+        document.getElementById('total-available').innerText = allCards?.length || 0;
 
-            allCards.forEach(card => {
-                const isActive = userOwnedCards.includes(card.id);
+        // 2. Charger les Récompenses
+        if (currentUser) {
+            const { data: rewards } = await supabase.from('rewards').select('*').eq('user_id', currentUser.id).order('claimed_at', { ascending: false });
+            const list = document.getElementById('reward-list');
+            list.innerHTML = rewards?.length ? '' : '<p style="color: #666;">Pas encore de cadeaux.</p>';
+            
+            rewards?.forEach(r => {
                 const div = document.createElement('div');
-                div.className = `card-item ${isActive ? 'active' : ''}`;
+                div.className = `reward-card ${r.consumed_at ? 'used' : ''}`;
+                div.innerHTML = `<div><strong>${r.type}</strong><br><small>${r.consumed_at ? 'Consommé' : 'Disponible'}</small></div>`;
                 
-                // On peut utiliser une image par défaut ou card.image_url si tu en as
-                const imgUrl = `https://via.placeholder.com/300/111/d4af37?text=${card.name}`;
-
-                div.innerHTML = `
-                    <span class="rarity-tag ${card.type}">${card.type}</span>
-                    <img src="${imgUrl}" alt="${card.name}">
-                    <div class="card-label">${card.name}</div>
-                `;
-
-                if(card.type === 'puzzle') gridPuzzles.appendChild(div);
-                else gridExclu.appendChild(div);
+                if (!r.consumed_at && isAdmin) {
+                    const btn = document.createElement('button');
+                    btn.className = "pill gold";
+                    btn.innerText = "VALIDER";
+                    btn.onclick = () => validateReward(r.id);
+                    div.appendChild(btn);
+                }
+                list.appendChild(div);
             });
         }
     }
 
-    // --- LOGIQUE DE SCAN (TICKETS UNIQUES) ---
-    async function checkParams() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const ticketCode = urlParams.get('ticket');
-
+    // --- LOGIQUE SCAN (Tickets) ---
+    async function checkScanTicket() {
+        const ticketCode = new URLSearchParams(window.location.search).get('ticket');
         if (ticketCode) {
-            if (!currentUser) {
-                sessionStorage.setItem('pending_ticket', ticketCode);
-                showOverlay("CONNEXION REQUISE", "Inscris-toi ou connecte-toi pour valider cette carte !");
-                openRegister();
-                return;
-            }
+            if (!currentUser) return (sessionStorage.setItem('pending_ticket', ticketCode), openRegister());
 
-            // 1. Vérifier si le ticket est valide et libre
-            const { data: ticket, error } = await supabase
-                .from('qr_tickets')
-                .select('*, cards(id, name)')
-                .eq('id', ticketCode)
-                .single();
+            const { data: ticket } = await supabase.from('qr_tickets').select('*, cards(id, name, type)').eq('id', ticketCode).single();
+            if (!ticket || ticket.is_used) return alert("Code invalide ou déjà utilisé.");
 
-            if (error || !ticket) return alert("QR Code invalide.");
-            if (ticket.is_used) return alert("Ce code a déjà été utilisé !");
-
-            // 2. Ajouter la carte à l'utilisateur
-            const { error: insError } = await supabase
-                .from('user_cards')
-                .insert([{ user_id: currentUser.id, card_id: ticket.card_id }]);
-
-            if (insError) {
-                if(insError.code === '23505') alert("Tu as déjà cette carte !");
-                window.history.replaceState({}, document.title, window.location.pathname);
-                return;
-            }
-
-            // 3. Marquer le ticket comme utilisé
+            // Ajouter la carte
+            const { error } = await supabase.from('user_cards').insert([{ user_id: currentUser.id, card_id: ticket.card_id }]);
+            if (error && error.code === '23505') return alert("Tu as déjà cette carte !");
+            
             await supabase.from('qr_tickets').update({ is_used: true, used_by: currentUser.id }).eq('id', ticketCode);
+            
+            // LOGIQUE CADEAU AUTOMATIQUE (Exemple : si carte RARE scannee)
+            if (ticket.cards.type === 'rare') {
+                await supabase.from('rewards').insert([{ user_id: currentUser.id, type: 'SHOT OFFERT (CARTE RARE)' }]);
+            }
 
             runConfetti();
-            showReward(ticket.cards.name);
-            fetchAndRenderCards();
-            window.history.replaceState({}, document.title, window.location.pathname);
+            showReward(`Carte débloquée : ${ticket.cards.name}`);
+            await renderAll();
+            window.history.replaceState({}, '', window.location.pathname);
         }
     }
 
-    // --- AUTHENTIFICATION ---
+    async function validateReward(rewardId) {
+        if (!confirm("Le barman valide ce verre ?")) return;
+        const { error } = await supabase.from('rewards').update({ 
+            consumed_at: new Date(), 
+            consumed_by: currentUser.id 
+        }).eq('id', rewardId);
+        if (!error) renderAll();
+    }
+
+    // --- AUTH / UI ---
     async function handleAuth() {
         const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-pass').value;
-        const pseudo = document.getElementById('reg-pseudo').value;
-
-        // On tente d'abord de créer le compte
-        const { data, error } = await supabase.auth.signUp({ 
-            email, 
-            password,
-            options: { data: { display_name: pseudo } }
-        });
-
-        if (error) {
-            // Si le compte existe déjà, on tente de se connecter
-            const { data: logData, error: logError } = await supabase.auth.signInWithPassword({ email, password });
-            if (logError) return alert(logError.message);
-        }
-
-        location.reload(); // Recharge pour initialiser la session
-    }
-
-    async function handleLogout() {
-        await supabase.auth.signOut();
+        const pass = document.getElementById('reg-pass').value;
+        const { error } = await supabase.auth.signUp({ email, password: pass });
+        if (error) await supabase.auth.signInWithPassword({ email, password: pass });
         location.reload();
     }
-
-    // --- UI HELPERS ---
-    function showReward(name){
-      document.getElementById('reward-title').innerText = "NOUVELLE CARTE !";
-      document.getElementById('reward-desc').innerText = `Tu as débloqué : ${name}\nTa collection est sauvegardée sur ton compte.`;
-      document.getElementById('reward-overlay').style.display = 'flex';
-    }
-    function showOverlay(t, d){
-      document.getElementById('reward-title').innerText = t;
-      document.getElementById('reward-desc').innerText = d;
-      document.getElementById('reward-overlay').style.display = 'flex';
-    }
-    function closeOverlay(){ document.getElementById('reward-overlay').style.display = 'none'; }
-    function openRegister(){ document.getElementById('register-modal').style.display = 'flex'; }
-    function closeRegister(){ document.getElementById('register-modal').style.display = 'none'; }
+    function handleLogout() { supabase.auth.signOut().then(() => location.reload()); }
+    function openRegister() { document.getElementById('register-modal').style.display = 'flex'; }
+    function closeRegister() { document.getElementById('register-modal').style.display = 'none'; }
+    function showReward(msg) { document.getElementById('reward-desc').innerText = msg; document.getElementById('reward-overlay').style.display = 'flex'; }
+    function closeOverlay() { document.getElementById('reward-overlay').style.display = 'none'; }
 
     // --- CONFETTI ---
-    const confettiCanvas = document.getElementById('confetti');
-    const ctx = confettiCanvas.getContext('2d');
-    function resize(){ confettiCanvas.width = window.innerWidth; confettiCanvas.height = window.innerHeight; }
+    const c = document.getElementById('confetti'); const ctx = c.getContext('2d');
+    function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
     window.onresize = resize; resize();
-
-    function runConfetti(){
-      const W = confettiCanvas.width, H = confettiCanvas.height;
-      const pieces = [];
-      for(let i=0; i<100; i++){
-        pieces.push({
-          x: Math.random()*W, y: -20, r: 5+Math.random()*5,
-          vx: -2+Math.random()*4, vy: 2+Math.random()*5,
-          c: ['#d4af37','#0077b6','#ffffff'][Math.floor(Math.random()*3)]
-        });
-      }
-      function tick(){
-        ctx.clearRect(0,0,W,H);
-        pieces.forEach(p => {
-          p.x += p.vx; p.y += p.vy; p.vy += 0.02;
-          ctx.fillStyle = p.c;
-          ctx.fillRect(p.x, p.y, p.r, p.r);
-        });
-        if(pieces.some(p => p.y < H)) requestAnimationFrame(tick);
-      }
-      tick();
+    function runConfetti() {
+        const p = []; for(let i=0; i<100; i++) p.push({x:Math.random()*c.width, y:-20, r:5+Math.random()*5, vx:-2+Math.random()*4, vy:2+Math.random()*5, c:['#d4af37','#0077b6','#fff'][Math.floor(Math.random()*3)]});
+        function t() { ctx.clearRect(0,0,c.width,c.height); p.forEach(i => { i.x+=i.vx; i.y+=i.vy; i.vy+=0.02; ctx.fillStyle=i.c; ctx.fillRect(i.x,i.y,i.r,i.r); }); if(p.some(i => i.y < c.height)) requestAnimationFrame(t); }
+        t();
     }
-
     window.onload = initApp;
   </script>
 </body>
