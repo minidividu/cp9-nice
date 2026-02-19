@@ -55,7 +55,6 @@
     .puzzle{background:var(--puzzle-blue);}
     .rare{background:var(--rare-red);}
 
-    /* REWARDS SECTION */
     .reward-list { padding: 20px; }
     .reward-card {
       background: #1a1a1a; border-left: 4px solid var(--gold);
@@ -64,7 +63,6 @@
     }
     .reward-card.used { opacity: 0.5; border-color: #555; filter: grayscale(1); }
 
-    /* OVERLAYS */
     #reward-overlay, #register-modal {
       position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:10000; 
       display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px;
@@ -143,9 +141,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <script>
-    // --- CONNEXION SUPABASE ---
+    // --- CONNEXION CONFIGURÉE ---
     const SUPABASE_URL = 'https://qqtbaxaomrophaiszwtr.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_SqgX_Vzxas58tEQwuvlUaQ_TrXaMNWd'; //
+    const SUPABASE_KEY = 'sb_publishable_SqgX_Vzxas58tEQwuvlUaQ_TrXaMNWd';
     const supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null;
@@ -156,7 +154,7 @@
         currentUser = session?.user || null;
         
         if (currentUser) {
-            // Vérifier si l'utilisateur est admin
+            // Vérification du statut admin dans la table profiles
             const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).single();
             isAdmin = profile?.is_admin || false;
         }
@@ -179,7 +177,6 @@
     }
 
     async function renderAll() {
-        // 1. Charger les cartes
         const { data: allCards } = await supabase.from('cards').select('*').order('slot_index');
         let ownedIds = [];
         if (currentUser) {
@@ -187,7 +184,6 @@
             ownedIds = owned ? owned.map(c => c.card_id) : [];
         }
 
-        // Rendu Grille
         const grids = { puzzle: document.getElementById('grid-puzzles'), rare: document.getElementById('grid-exclu') };
         grids.puzzle.innerHTML = ''; grids.rare.innerHTML = '';
         
@@ -202,7 +198,6 @@
         document.getElementById('count').innerText = ownedIds.length;
         document.getElementById('total-available').innerText = allCards?.length || 0;
 
-        // 2. Charger les Récompenses
         if (currentUser) {
             const { data: rewards } = await supabase.from('rewards').select('*').eq('user_id', currentUser.id).order('claimed_at', { ascending: false });
             const list = document.getElementById('reward-list');
@@ -215,8 +210,7 @@
                 
                 if (!r.consumed_at && isAdmin) {
                     const btn = document.createElement('button');
-                    btn.className = "pill gold";
-                    btn.innerText = "VALIDER";
+                    btn.className = "pill gold"; btn.innerText = "VALIDER";
                     btn.onclick = () => validateReward(r.id);
                     div.appendChild(btn);
                 }
@@ -225,7 +219,6 @@
         }
     }
 
-    // --- LOGIQUE SCAN (Tickets) ---
     async function checkScanTicket() {
         const ticketCode = new URLSearchParams(window.location.search).get('ticket');
         if (ticketCode) {
@@ -234,13 +227,11 @@
             const { data: ticket } = await supabase.from('qr_tickets').select('*, cards(id, name, type)').eq('id', ticketCode).single();
             if (!ticket || ticket.is_used) return alert("Code invalide ou déjà utilisé.");
 
-            // Ajouter la carte
             const { error } = await supabase.from('user_cards').insert([{ user_id: currentUser.id, card_id: ticket.card_id }]);
             if (error && error.code === '23505') return alert("Tu as déjà cette carte !");
             
             await supabase.from('qr_tickets').update({ is_used: true, used_by: currentUser.id }).eq('id', ticketCode);
             
-            // LOGIQUE CADEAU AUTOMATIQUE (Exemple : si carte RARE scannee)
             if (ticket.cards.type === 'rare') {
                 await supabase.from('rewards').insert([{ user_id: currentUser.id, type: 'SHOT OFFERT (CARTE RARE)' }]);
             }
@@ -261,7 +252,6 @@
         if (!error) renderAll();
     }
 
-    // --- AUTH / UI ---
     async function handleAuth() {
         const email = document.getElementById('reg-email').value;
         const pass = document.getElementById('reg-pass').value;
@@ -269,13 +259,13 @@
         if (error) await supabase.auth.signInWithPassword({ email, password: pass });
         location.reload();
     }
+
     function handleLogout() { supabase.auth.signOut().then(() => location.reload()); }
     function openRegister() { document.getElementById('register-modal').style.display = 'flex'; }
     function closeRegister() { document.getElementById('register-modal').style.display = 'none'; }
     function showReward(msg) { document.getElementById('reward-desc').innerText = msg; document.getElementById('reward-overlay').style.display = 'flex'; }
     function closeOverlay() { document.getElementById('reward-overlay').style.display = 'none'; }
 
-    // --- CONFETTI ---
     const c = document.getElementById('confetti'); const ctx = c.getContext('2d');
     function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
     window.onresize = resize; resize();
