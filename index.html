@@ -64,13 +64,6 @@
     .rare{background:var(--rare-red);}
     .puzzle{background:var(--puzzle-blue);}
 
-    .scan-btn{
-      background:var(--gold);color:#000;
-      padding:18px 40px;border-radius:50px;font-weight:900;text-decoration:none;
-      display:inline-block;margin:20px 0 50px;
-      box-shadow:0 4px 15px rgba(212,175,55,.4);
-    }
-
     #reward-overlay{
       position:fixed;top:0;left:0;width:100%;height:100%;
       background:rgba(0,0,0,.95);z-index:10000;display:none;
@@ -99,7 +92,6 @@
       background:#070707;border:1px solid #2a2a2a;color:#fff;border-radius:12px;
       padding:12px;font-weight:800;outline:none;
     }
-
     #confetti{position:fixed;inset:0;pointer-events:none;z-index:12000;}
   </style>
 </head>
@@ -115,13 +107,11 @@
   <div class="status-panel">
     <div class="status-left">
       <div style="color:var(--gold);font-weight:900;">VOTRE COLLECTION</div>
-      <div style="font-size:1.5em;font-weight:900;"><span id="count">0</span> / 12</div>
-      <div id="profile-badge" style="color:#aaa;font-size:.85em;">Profil: non inscrit</div>
+      <div style="font-size:1.5em;font-weight:900;"><span id="count">0</span> / <span id="total-available">12</span></div>
+      <div id="profile-badge" style="color:#aaa;font-size:.85em;">Chargement...</div>
     </div>
-    <div class="status-right">
-      <button class="pill" onclick="openRegister()">📝 S’INSCRIRE</button>
-      <button class="pill" onclick="resetAll()">RESET</button>
-    </div>
+    <div class="status-right" id="auth-controls">
+      </div>
   </div>
 
   <h3 style="color:var(--puzzle-blue);margin:10px 0 0;">🧩 PUZZLES</h3>
@@ -129,10 +119,6 @@
 
   <h3 style="color:var(--rare-red);margin:10px 0 0;">💎 CARTES RARES</h3>
   <div class="card-container" id="grid-exclu"></div>
-
-  <div style="margin-top: 30px;">
-    <p style="color: #666; font-size: 0.8em;">Scannez le QR Code derrière vos cartes pour les ajouter.</p>
-  </div>
 
   <div id="reward-overlay">
     <div class="reward-box">
@@ -144,136 +130,187 @@
 
   <div id="register-modal">
     <div class="modal-box">
-      <p style="color:var(--gold);font-weight:900;margin:0 0 10px;">VOTRE PROFIL</p>
+      <p id="modal-title" style="color:var(--gold);font-weight:900;margin:0 0 10px;">REJOINDRE LA SQUADRA</p>
       <div class="field">
-        <label style="font-size:.85em;color:#bbb;">Pseudo</label>
-        <input id="reg-name" placeholder="ex: Noeh" maxlength="20" />
+        <label style="font-size:.85em;color:#bbb;">Email (pour sauvegarder ta collec)</label>
+        <input id="reg-email" type="email" placeholder="ton@email.com" />
       </div>
       <div class="field">
-        <label style="font-size:.85em;color:#bbb;">Instagram (optionnel)</label>
-        <input id="reg-ig" placeholder="@toninsta" maxlength="30" />
+        <label style="font-size:.85em;color:#bbb;">Mot de passe</label>
+        <input id="reg-pass" type="password" placeholder="******" />
+      </div>
+      <div id="extra-fields">
+          <div class="field">
+            <label style="font-size:.85em;color:#bbb;">Pseudo Instagram</label>
+            <input id="reg-pseudo" placeholder="@toninsta" />
+          </div>
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
         <button class="btn dark" onclick="closeRegister()">Annuler</button>
-        <button class="btn" onclick="saveRegister()">Valider</button>
+        <button class="btn" id="auth-submit-btn" onclick="handleAuth()">Valider</button>
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <script>
-    const CARD_DATA = [
-      { id:'shots_1', name:'S - SHOTS', type:'puzzle' },
-      { id:'shots_2', name:'H - SHOTS', type:'puzzle' },
-      { id:'shots_3', name:'O - SHOTS', type:'puzzle' },
-      { id:'shots_4', name:'T - SHOTS', type:'puzzle' },
-      { id:'dj_1', name:'MUSIQUE 1/3', type:'puzzle' },
-      { id:'dj_2', name:'MUSIQUE 2/3', type:'puzzle' },
-      { id:'dj_3', name:'MUSIQUE 3/3', type:'puzzle' },
-      { id:'bouteille_a', name:'BOUT. GAUCHE', type:'rare' },
-      { id:'bouteille_b', name:'BOUT. DROITE', type:'rare' },
-      { id:'cocktail', name:'MIXOLOGUE', type:'legend' },
-    ];
+    // --- CONFIGURATION (À REMPLACER) ---
+    const SUPABASE_URL = 'https://VOTRE_PROJET.supabase.co';
+    const SUPABASE_KEY = 'VOTRE_ANON_KEY';
+    const supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const STORAGE_CARDS = 'cp9_cards';
-    const STORAGE_PROFILE = 'cp9_profile';
+    let currentUser = null;
+    let userOwnedCards = []; // Liste des card_id possédés
 
-    let collection = JSON.parse(localStorage.getItem(STORAGE_CARDS)) || [];
-    let profile = JSON.parse(localStorage.getItem(STORAGE_PROFILE)) || null;
+    // --- INITIALISATION ---
+    async function initApp() {
+        const { data: { session } } = await supabase.auth.getSession();
+        currentUser = session?.user || null;
+        updateAuthUI();
+        await fetchAndRenderCards();
+        checkParams();
+    }
 
-    function initGrid(){
-      const gridPuzzles = document.getElementById('grid-puzzles');
-      const gridExclu = document.getElementById('grid-exclu');
-      gridPuzzles.innerHTML = '';
-      gridExclu.innerHTML = '';
-
-      CARD_DATA.forEach(card => {
-        const div = document.createElement('div');
-        div.className = `card-item ${collection.includes(card.id) ? 'active' : ''}`;
+    function updateAuthUI() {
+        const container = document.getElementById('auth-controls');
+        const badge = document.getElementById('profile-badge');
         
-        const placeholder = `https://via.placeholder.com/300/111/d4af37?text=${card.id.toUpperCase()}`;
-
-        div.innerHTML = `
-          <span class="rarity-tag ${card.type}">${card.type}</span>
-          <img src="${placeholder}" alt="${card.name}">
-          <div class="card-label">${card.name}</div>
-        `;
-
-        if(card.type === 'puzzle') gridPuzzles.appendChild(div);
-        else gridExclu.appendChild(div);
-      });
-
-      document.getElementById('count').innerText = collection.length;
-      if(profile) document.getElementById('profile-badge').textContent = `Profil: ${profile.name}`;
-    }
-
-    function checkParams(){
-      const urlParams = new URLSearchParams(window.location.search);
-      const getCard = urlParams.get('get');
-
-      if(getCard){
-        const card = CARD_DATA.find(c => c.id === getCard);
-        if(!card){
-          alert("Carte inconnue");
-          return;
-        }
-
-        if(!collection.includes(getCard)){
-          collection.push(getCard);
-          localStorage.setItem(STORAGE_CARDS, JSON.stringify(collection));
-          runConfetti();
-          showReward(card);
+        if (currentUser) {
+            badge.textContent = `Profil: ${currentUser.email}`;
+            container.innerHTML = `<button class="pill" onclick="handleLogout()">DÉCONNEXION</button>`;
         } else {
-          showOverlay("DÉJÀ POSSÉDÉE", `Tu as déjà la carte ${card.name}.`);
+            badge.textContent = `Profil: non inscrit`;
+            container.innerHTML = `<button class="pill gold" onclick="openRegister()">📝 S’INSCRIRE</button>`;
         }
-        // Nettoie l'URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
     }
 
-    function showReward(card){
-      const overlay = document.getElementById('reward-overlay');
+    async function fetchAndRenderCards() {
+        // 1. Charger toutes les cartes du catalogue
+        const { data: allCards } = await supabase.from('cards').select('*').order('slot_index');
+        
+        // 2. Charger les cartes possédées par l'user
+        if (currentUser) {
+            const { data: owned } = await supabase
+                .from('user_cards')
+                .select('card_id')
+                .eq('user_id', currentUser.id);
+            userOwnedCards = owned ? owned.map(c => c.card_id) : [];
+        }
+
+        const gridPuzzles = document.getElementById('grid-puzzles');
+        const gridExclu = document.getElementById('grid-exclu');
+        gridPuzzles.innerHTML = ''; gridExclu.innerHTML = '';
+        
+        if (allCards) {
+            document.getElementById('total-available').innerText = allCards.length;
+            document.getElementById('count').innerText = userOwnedCards.length;
+
+            allCards.forEach(card => {
+                const isActive = userOwnedCards.includes(card.id);
+                const div = document.createElement('div');
+                div.className = `card-item ${isActive ? 'active' : ''}`;
+                
+                // On peut utiliser une image par défaut ou card.image_url si tu en as
+                const imgUrl = `https://via.placeholder.com/300/111/d4af37?text=${card.name}`;
+
+                div.innerHTML = `
+                    <span class="rarity-tag ${card.type}">${card.type}</span>
+                    <img src="${imgUrl}" alt="${card.name}">
+                    <div class="card-label">${card.name}</div>
+                `;
+
+                if(card.type === 'puzzle') gridPuzzles.appendChild(div);
+                else gridExclu.appendChild(div);
+            });
+        }
+    }
+
+    // --- LOGIQUE DE SCAN (TICKETS UNIQUES) ---
+    async function checkParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ticketCode = urlParams.get('ticket');
+
+        if (ticketCode) {
+            if (!currentUser) {
+                sessionStorage.setItem('pending_ticket', ticketCode);
+                showOverlay("CONNEXION REQUISE", "Inscris-toi ou connecte-toi pour valider cette carte !");
+                openRegister();
+                return;
+            }
+
+            // 1. Vérifier si le ticket est valide et libre
+            const { data: ticket, error } = await supabase
+                .from('qr_tickets')
+                .select('*, cards(id, name)')
+                .eq('id', ticketCode)
+                .single();
+
+            if (error || !ticket) return alert("QR Code invalide.");
+            if (ticket.is_used) return alert("Ce code a déjà été utilisé !");
+
+            // 2. Ajouter la carte à l'utilisateur
+            const { error: insError } = await supabase
+                .from('user_cards')
+                .insert([{ user_id: currentUser.id, card_id: ticket.card_id }]);
+
+            if (insError) {
+                if(insError.code === '23505') alert("Tu as déjà cette carte !");
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+
+            // 3. Marquer le ticket comme utilisé
+            await supabase.from('qr_tickets').update({ is_used: true, used_by: currentUser.id }).eq('id', ticketCode);
+
+            runConfetti();
+            showReward(ticket.cards.name);
+            fetchAndRenderCards();
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+
+    // --- AUTHENTIFICATION ---
+    async function handleAuth() {
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-pass').value;
+        const pseudo = document.getElementById('reg-pseudo').value;
+
+        // On tente d'abord de créer le compte
+        const { data, error } = await supabase.auth.signUp({ 
+            email, 
+            password,
+            options: { data: { display_name: pseudo } }
+        });
+
+        if (error) {
+            // Si le compte existe déjà, on tente de se connecter
+            const { data: logData, error: logError } = await supabase.auth.signInWithPassword({ email, password });
+            if (logError) return alert(logError.message);
+        }
+
+        location.reload(); // Recharge pour initialiser la session
+    }
+
+    async function handleLogout() {
+        await supabase.auth.signOut();
+        location.reload();
+    }
+
+    // --- UI HELPERS ---
+    function showReward(name){
       document.getElementById('reward-title').innerText = "NOUVELLE CARTE !";
-      document.getElementById('reward-desc').innerText = `Tu as débloqué : ${card.name}\n\nContinue la collection pour gagner des verres !`;
-      overlay.style.display = 'flex';
-      initGrid();
+      document.getElementById('reward-desc').innerText = `Tu as débloqué : ${name}\nTa collection est sauvegardée sur ton compte.`;
+      document.getElementById('reward-overlay').style.display = 'flex';
     }
-
     function showOverlay(t, d){
-      const overlay = document.getElementById('reward-overlay');
       document.getElementById('reward-title').innerText = t;
       document.getElementById('reward-desc').innerText = d;
-      overlay.style.display = 'flex';
+      document.getElementById('reward-overlay').style.display = 'flex';
     }
-
-    function closeOverlay(){
-      document.getElementById('reward-overlay').style.display = 'none';
-    }
-
-    function openRegister(){
-      document.getElementById('register-modal').style.display = 'flex';
-    }
-
-    function closeRegister(){
-      document.getElementById('register-modal').style.display = 'none';
-    }
-
-    function saveRegister(){
-      const name = document.getElementById('reg-name').value.trim();
-      const ig = document.getElementById('reg-ig').value.trim();
-      if(!name) return alert("Pseudo requis");
-
-      profile = { name, ig };
-      localStorage.setItem(STORAGE_PROFILE, JSON.stringify(profile));
-      closeRegister();
-      initGrid();
-    }
-
-    function resetAll(){
-      if(confirm("Supprimer ta collection ?")){
-        localStorage.clear();
-        location.reload();
-      }
-    }
+    function closeOverlay(){ document.getElementById('reward-overlay').style.display = 'none'; }
+    function openRegister(){ document.getElementById('register-modal').style.display = 'flex'; }
+    function closeRegister(){ document.getElementById('register-modal').style.display = 'none'; }
 
     // --- CONFETTI ---
     const confettiCanvas = document.getElementById('confetti');
@@ -303,7 +340,7 @@
       tick();
     }
 
-    window.onload = () => { initGrid(); checkParams(); };
+    window.onload = initApp;
   </script>
 </body>
 </html>
