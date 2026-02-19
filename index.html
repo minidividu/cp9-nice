@@ -82,15 +82,15 @@
   <script>
     const SUPABASE_URL = 'https://qqtbaxaomrophaiszwtr.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_SqgX_Vzxas58tEQwuvlUaQ_TrXaMNWd';
-    const supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabaseclient = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null, isAdmin = false, allCardsCache = [], ownedIds = [];
 
     async function initApp() {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await supabaseclient.auth.getSession();
         currentUser = session?.user || null;
         if (currentUser) {
-            const { data: p } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).single();
+            const { data: p } = await supabaseclient.from('profiles').select('is_admin').eq('id', currentUser.id).single();
             isAdmin = p?.is_admin || false;
         }
         updateAuthUI();
@@ -100,11 +100,11 @@
 
     async function renderAll(filterBarId = null) {
         if (allCardsCache.length === 0) {
-            const { data } = await supabase.from('cards').select('*').order('slot_index');
+            const { data } = await supabaseclient.from('cards').select('*').order('slot_index');
             allCardsCache = data || [];
         }
         if (currentUser) {
-            const { data } = await supabase.from('user_cards').select('card_id').eq('user_id', currentUser.id);
+            const { data } = await supabaseclient.from('user_cards').select('card_id').eq('user_id', currentUser.id);
             ownedIds = data ? data.map(c => c.card_id) : [];
         }
 
