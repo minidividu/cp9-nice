@@ -9,28 +9,43 @@
     body{ font-family:'Segoe UI',sans-serif; background:var(--bg-dark); color:#fff; margin:0; padding:0; text-align:center; }
     .header{ background:linear-gradient(to bottom,#1a1a1a,#000); padding:40px 20px; border-bottom:2px solid var(--gold); }
     h1{margin:0; letter-spacing:5px; color:var(--gold); font-size:2.2em; text-transform:uppercase;}
+    
     .status-panel{ background:#111; margin:20px; padding:15px; border-radius:15px; border:1px solid #333; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
     .status-left{display:flex; flex-direction:column; align-items:flex-start; text-align:left; gap:6px;}
+    
     .pill{ border:1px solid #333; background:#0d0d0d; color:#fff; padding:10px 14px; border-radius:999px; font-weight:800; cursor:pointer; }
     .pill.gold{background:var(--gold); color:#000; border:none;}
+    
     .card-container{ display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:12px; padding:20px; }
     .card-item{ background:#151515; border:2px solid #222; border-radius:12px; overflow:hidden; position:relative; transition:all .35s ease; filter:grayscale(100%) brightness(50%); }
     .card-item.active{ border-color:var(--gold); filter:grayscale(0%) brightness(100%); box-shadow:0 0 15px rgba(212,175,55,.3); transform:translateY(-5px); }
-    /* Style spécifique pour la carte Bar cliquable */
-    .card-item.type-bar { cursor: pointer; filter: none !important; opacity: 1 !important; border-color: #28a745; }
+    
+    /* Animation et style pour les cartes BAR */
+    .card-item.type-bar { cursor: pointer; filter: none !important; opacity: 1 !important; border-color: #28a745; animation: pulse-bar 2s infinite; }
+    .card-item.type-bar:hover { transform: scale(1.1) rotate(2deg); box-shadow: 0 0 20px rgba(40, 167, 69, 0.6); z-index: 100; }
+    
     .card-item img{width:100%; display:block;}
     .card-label{font-size:.65em; padding:8px 2px; font-weight:900; background:#000;}
     .rarity-tag{ position:absolute; top:6px; left:6px; font-size:.55em; padding:3px 6px; border-radius:4px; text-transform:uppercase; z-index:10; }
+    
     .puzzle{background:var(--puzzle-blue);} .rare{background:var(--rare-red);} .bar{background:#28a745;}
+    
     .reward-list { padding: 20px; }
     .reward-card { background: #1a1a1a; border-left: 4px solid var(--gold); padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
     .reward-card.used { opacity: 0.5; border-color: #555; filter: grayscale(1); }
+    
     #reward-overlay, #register-modal { position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:10000; display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px; }
     .modal-box { width:92%; max-width:420px; border:2px solid var(--gold); border-radius:20px; padding:20px; background:#111; text-align:center; }
     .field{display:flex; flex-direction:column; gap:6px; margin:10px 0; text-align: left;}
     .field input{ background:#070707; border:1px solid #2a2a2a; color:#fff; border-radius:12px; padding:12px; font-weight:800; outline:none; }
     .btn{ background:var(--gold); border:none; padding:12px 20px; border-radius:10px; font-weight:900; cursor:pointer; margin-top:12px; width: 100%; }
     #confetti{position:fixed; inset:0; pointer-events:none; z-index:12000;}
+
+    @keyframes pulse-bar {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    }
   </style>
 </head>
 <body>
@@ -80,17 +95,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // --- CONNEXION UNIQUE ---
     const SUPABASE_URL = 'https://qqtbaxaomrophaiszwtr.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_SqgX_Vzxas58tEQwuvlUaQ_TrXaMNWd';
-    const supabaseclient = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = lib.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null, isAdmin = false, allCardsCache = [], ownedIds = [];
 
     async function initApp() {
-        const { data: { session } } = await supabaseclient.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         currentUser = session?.user || null;
         if (currentUser) {
-            const { data: p } = await supabaseclient.from('profiles').select('is_admin').eq('id', currentUser.id).single();
+            const { data: p } = await supabase.from('profiles').select('is_admin').eq('id', currentUser.id).single();
             isAdmin = p?.is_admin || false;
         }
         updateAuthUI();
@@ -100,18 +116,18 @@
 
     async function renderAll(filterBarId = null) {
         if (allCardsCache.length === 0) {
-            const { data } = await supabaseclient.from('cards').select('*').order('slot_index');
+            // Récupère les cartes depuis la base de données
+            const { data } = await supabase.from('cards').select('*').order('slot_index');
             allCardsCache = data || [];
         }
         if (currentUser) {
-            const { data } = await supabaseclient.from('user_cards').select('card_id').eq('user_id', currentUser.id);
+            const { data } = await supabase.from('user_cards').select('card_id').eq('user_id', currentUser.id);
             ownedIds = data ? data.map(c => c.card_id) : [];
         }
 
         const grids = { puzzle: document.getElementById('grid-puzzle'), rare: document.getElementById('grid-rare'), bar: document.getElementById('grid-bar') };
         Object.values(grids).forEach(g => g.innerHTML = '');
 
-        // Gestion du titre et du bouton retour
         document.getElementById('back-btn-container').style.display = filterBarId ? 'block' : 'none';
         document.getElementById('filter-title').innerText = filterBarId ? "COLLECTION FILTRÉE" : "TOUTE LA COLLECTION";
 
