@@ -18,7 +18,6 @@ async function initApp() {
     updateAuthUI();
     await renderAll();
 
-    // AMÉLIORATION : Gérer le ticket mis en attente pendant l'inscription
     const pendingTicket = sessionStorage.getItem('pending_ticket');
     if (pendingTicket && currentUser) {
         sessionStorage.removeItem('pending_ticket');
@@ -126,40 +125,149 @@ async function processTicket(code) {
 function cleanUrl() { window.history.replaceState({}, '', window.location.pathname); }
 
 // --- 4. AUTHENTIFICATION ---
-async function handleAuth() {
-    const email = document.getElementById('reg-email').value;
-    const pass = document.getElementById('reg-pass').value;
+function toggleAuthMode() {
+    const signupForm = document.getElementById('signup-form');
+    const loginForm = document.getElementById('login-form');
+    const title = document.getElementById('auth-title');
+    const errorDiv = document.getElementById('auth-error');
 
-    if (!email || pass.length < 6) return alert("Email valide et 6 caractères min pour le mot de passe.");
+    errorDiv.style.display = 'none';
+    errorDiv.innerHTML = '';
 
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password: pass });
-
-    if (signUpError) {
-        // AMÉLIORATION : Connexion auto si déjà inscrit
-        if (signUpError.message.includes("already registered")) {
-            const { error: loginError } = await supabase.auth.signInWithPassword({ email, password: pass });
-            if (loginError) return alert("Erreur : " + loginError.message);
-        } else {
-            return alert("Erreur : " + signUpError.message);
-        }
-    } else if (data.user && !data.session) {
-        return alert("Inscription réussie ! Vérifie tes emails (ou désactive 'Confirm Email' dans Supabase).");
+    if (signupForm.style.display === 'none') {
+        signupForm.style.display = 'block';
+        loginForm.style.display = 'none';
+        title.textContent = 'REJOINDRE LA SQUADRA';
+    } else {
+        signupForm.style.display = 'none';
+        loginForm.style.display = 'block';
+        title.textContent = 'SE CONNECTER';
     }
-    location.reload();
+}
+
+function showAuthError(message) {
+    const errorDiv = document.getElementById('auth-error');
+    errorDiv.innerHTML = message;
+    errorDiv.style.display = 'block';
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+async function handleSignup() {
+    const email = document.getElementById('reg-email').value.trim();
+    const pass = document.getElementById('reg-pass').value;
+    const passConfirm = document.getElementById('reg-pass-confirm').value;
+    const btn = document.getElementById('signup-btn');
+
+    if (!email) return showAuthError('Veuillez entrer un email valide.');
+    if (!email.includes('@')) return showAuthError('L\'email n\'est pas valide.');
+    if (pass.length < 6) return showAuthError('Le mot de passe doit faire au moins 6 caractères.');
+    if (pass !== passConfirm) return showAuthError('Les mots de passe ne correspondent pas.');
+
+    btn.disabled = true;
+    btn.textContent = 'INSCRIPTION EN COURS...';
+
+    try {
+        const { data, error: signUpError } = await supabase.auth.signUp({ email, password: pass });
+
+        if (signUpError) {
+            if (signUpError.message.includes('already registered')) {
+                showAuthError('Cet email est déjà inscrit. Essaye de te connecter !');
+            } else if (signUpError.message.includes('Password')) {
+                showAuthError('Le mot de passe ne respecte pas les critères de sécurité.');
+            } else {
+                showAuthError(`Erreur d'inscription : ${signUpError.message}`);
+            }
+            btn.disabled = false;
+            btn.textContent = 'S\'INSCRIRE';
+            return;
+        }
+
+        showAuthError('✅ Inscription réussie ! Tu peux maintenant te connecter.');
+        setTimeout(() => toggleAuthMode(), 1500);
+        document.getElementById('reg-email').value = '';
+        document.getElementById('reg-pass').value = '';
+        document.getElementById('reg-pass-confirm').value = '';
+        btn.disabled = false;
+        btn.textContent = 'S\'INSCRIRE';
+    } catch (err) {
+        showAuthError(`Erreur inattendue : ${err.message}`);
+        btn.disabled = false;
+        btn.textContent = 'S\'INSCRIRE';
+    }
+}
+
+async function handleLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-pass').value;
+    const btn = document.getElementById('login-btn');
+
+    if (!email) return showAuthError('Veuillez entrer votre email.');
+    if (!pass) return showAuthError('Veuillez entrer votre mot de passe.');
+
+    btn.disabled = true;
+    btn.textContent = 'CONNEXION EN COURS...';
+
+    try {
+        const { data, error: loginError } = await supabase.auth.signInWithPassword({ email, password: pass });
+
+        if (loginError) {
+            if (loginError.message.includes('Invalid login credentials')) {
+                showAuthError('Email ou mot de passe incorrect.');
+            } else if (loginError.message.includes('Email not confirmed')) {
+                showAuthError('Veuillez confirmer votre email avant de vous connecter.');
+            } else {
+                showAuthError(`Erreur de connexion : ${loginError.message}`);
+            }
+            btn.disabled = false;
+            btn.textContent = 'SE CONNECTER';
+            return;
+        }
+
+        showAuthError('✅ Connexion réussie ! Chargement de ta collection...');
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    } catch (err) {
+        showAuthError(`Erreur inattendue : ${err.message}`);
+        btn.disabled = false;
+        btn.textContent = 'SE CONNECTER';
+    }
 }
 
 // --- 5. UI & ANIMATIONS ---
 function updateAuthUI() {
     const ctrl = document.getElementById('auth-controls');
     if (currentUser) {
-        ctrl.innerHTML = `<button class="pill" onclick="supabase.auth.signOut().then(()=>location.reload())">DÉCONNEXION</button>`;
+        const userEmail = currentUser.email || 'Utilisateur';
+        ctrl.innerHTML = `
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span class="small-text" style="color: #999;">${userEmail}</span>
+                <button class="pill" onclick="supabase.auth.signOut().then(()=>location.reload())">DÉCONNEXION</button>
+            </div>
+        `;
     } else {
-        ctrl.innerHTML = `<button class="pill gold" onclick="openRegister()">REJOINDRE</button>`;
+        ctrl.innerHTML = `<button class="pill gold" onclick="openAuthModal()">REJOINDRE</button>`;
     }
 }
 
-function openRegister() { document.getElementById('register-modal').style.display = 'flex'; }
-function closeRegister() { document.getElementById('register-modal').style.display = 'none'; }
+function openAuthModal() {
+    document.getElementById('auth-modal').style.display = 'flex';
+    document.getElementById('signup-form').style.display = 'block';
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('auth-title').textContent = 'REJOINDRE LA SQUADRA';
+    document.getElementById('auth-error').style.display = 'none';
+    document.getElementById('auth-error').innerHTML = '';
+}
+
+function closeAuthModal() {
+    document.getElementById('auth-modal').style.display = 'none';
+    document.getElementById('reg-email').value = '';
+    document.getElementById('reg-pass').value = '';
+    document.getElementById('reg-pass-confirm').value = '';
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('auth-error').innerHTML = '';
+}
 function showReward(msg) {
     document.getElementById('reward-desc').innerText = `Gagné : ${msg}`;
     document.getElementById('reward-overlay').style.display = 'flex';

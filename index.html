@@ -40,13 +40,27 @@
     <h3 class="gold-text">🎁 RÉCOMPENSES</h3>
     <div class="reward-list" id="reward-list"></div>
 
-    <div id="register-modal" class="modal">
+    <div id="auth-modal" class="modal">
         <div class="modal-box">
-            <h2>REJOINDRE LA SQUADRA</h2>
-            <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="ton@email.com"></div>
-            <div class="field"><label>Mot de passe</label><input id="reg-pass" type="password" placeholder="******"></div>
-            <button class="btn" onclick="handleAuth()">VALIDER</button>
-            <button class="btn secondary" onclick="closeRegister()">ANNULER</button>
+            <h2 id="auth-title">REJOINDRE LA SQUADRA</h2>
+            <div id="auth-error" class="error-message" style="display:none;"></div>
+
+            <div id="signup-form">
+                <div class="field"><label>Email</label><input id="reg-email" type="email" placeholder="ton@email.com"></div>
+                <div class="field"><label>Mot de passe</label><input id="reg-pass" type="password" placeholder="Min. 6 caractères"></div>
+                <div class="field"><label>Confirmer mot de passe</label><input id="reg-pass-confirm" type="password" placeholder="Confirme ton mot de passe"></div>
+                <button class="btn" id="signup-btn" onclick="handleSignup()">S'INSCRIRE</button>
+                <p class="toggle-auth">Déjà inscrit ? <span onclick="toggleAuthMode()" style="color: var(--gold); cursor: pointer;">SE CONNECTER</span></p>
+            </div>
+
+            <div id="login-form" style="display:none;">
+                <div class="field"><label>Email</label><input id="login-email" type="email" placeholder="ton@email.com"></div>
+                <div class="field"><label>Mot de passe</label><input id="login-pass" type="password" placeholder="Ton mot de passe"></div>
+                <button class="btn" id="login-btn" onclick="handleLogin()">SE CONNECTER</button>
+                <p class="toggle-auth">Pas encore inscrit ? <span onclick="toggleAuthMode()" style="color: var(--gold); cursor: pointer;">S'INSCRIRE</span></p>
+            </div>
+
+            <button class="btn secondary" onclick="closeAuthModal()">ANNULER</button>
         </div>
     </div>
 
