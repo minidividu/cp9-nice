@@ -58,6 +58,24 @@
         </div>
     </div>
 
+    <div id="card-reveal-modal" class="modal">
+        <div class="card-reveal-container">
+            <div class="card-reveal-glow"></div>
+            <div class="card-reveal-content">
+                <div class="reveal-card">
+                    <span id="reveal-rarity" class="rarity-tag"></span>
+                    <div class="img-container">
+                        <img id="reveal-img" src="" alt="Carte">
+                    </div>
+                    <div class="card-label" id="reveal-name"></div>
+                </div>
+                <h2 class="reveal-title">NOUVELLE CARTE DÉBLOQUÉE</h2>
+                <p id="reveal-message" class="reveal-message"></p>
+                <button class="btn" onclick="closeCardReveal()">AJOUTER À MA COLLECTION</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script.js"></script>
 </body>

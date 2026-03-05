@@ -92,7 +92,6 @@ async function processTicket(code) {
         return;
     }
 
-    // Récupération sécurisée
     const { data: ticket, error } = await supabase
         .from('qr_tickets')
         .select('*, cards(*)')
@@ -116,7 +115,7 @@ async function processTicket(code) {
             await supabase.from('rewards').insert([{ user_id: currentUser.id, type: 'VERRE OFFERT' }]);
         }
         runConfetti();
-        showReward(ticket.cards?.name || "Nouvelle carte !");
+        showCardReveal(ticket.cards);
         await renderAll();
         cleanUrl();
     } else {
@@ -161,11 +160,47 @@ function updateAuthUI() {
 
 function openRegister() { document.getElementById('register-modal').style.display = 'flex'; }
 function closeRegister() { document.getElementById('register-modal').style.display = 'none'; }
-function showReward(msg) { 
-    document.getElementById('reward-desc').innerText = `Gagné : ${msg}`; 
-    document.getElementById('reward-overlay').style.display = 'flex'; 
+function showReward(msg) {
+    document.getElementById('reward-desc').innerText = `Gagné : ${msg}`;
+    document.getElementById('reward-overlay').style.display = 'flex';
 }
 function closeOverlay() { document.getElementById('reward-overlay').style.display = 'none'; }
+
+function showCardReveal(card) {
+    const modal = document.getElementById('card-reveal-modal');
+    const revealImg = document.getElementById('reveal-img');
+    const revealName = document.getElementById('reveal-name');
+    const revealRarity = document.getElementById('reveal-rarity');
+    const revealMessage = document.getElementById('reveal-message');
+
+    let imgSrc = `https://via.placeholder.com/300/111/d4af37?text=${card.name.split(' ')[0]}`;
+    const normalizedName = card.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    if (normalizedName.includes('riquiert')) {
+        imgSrc = 'yavsaintriquier.png';
+    }
+
+    revealImg.src = imgSrc;
+    revealName.textContent = card.name;
+    revealRarity.textContent = card.type;
+    revealRarity.className = `rarity-tag ${card.type}`;
+
+    let message = '';
+    if (card.type === 'rare') {
+        message = 'CARTE RARE OBTENUE ! Tu as gagné un verre offert !';
+    } else if (card.type === 'puzzle') {
+        message = 'PIECE DE PUZZLE OBTENUE ! Continue à collectionner !';
+    } else if (card.type === 'bar') {
+        message = 'ETABLISSEMENT DEBLOQUE ! Visite-le pour obtenir plus de cartes !';
+    }
+
+    revealMessage.textContent = message;
+    modal.style.display = 'flex';
+}
+
+function closeCardReveal() {
+    document.getElementById('card-reveal-modal').style.display = 'none';
+}
 
 // RECOMPENSES
 async function renderRewards() {
